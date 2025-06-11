@@ -58,16 +58,16 @@ class BaseValidator {
 	}
 
 	async testFn(report, fn) {
+		let errors = [];
 		try {
 			const test = new Test();
 			await fn(report, test);
-			report.results.custom = test.errors;
+			errors = test.errors;
 		} catch (error) {
-			report.results.custom = [
-				error
-			];
+			errors = [error];
 		} finally {
-			if (report.results.custom.length > 0) {
+			report.results.custom = (report.results.custom || []).concat(errors);
+			if (errors.length > 0) {
 				report.valid = false;
 			}
 		}
