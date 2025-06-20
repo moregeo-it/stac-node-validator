@@ -37,7 +37,7 @@
     "uri-js": "^4.4.1"
   },
   "devDependencies": {
-    "jest": "^29.0.1"
+    "jest": "^30.0.2"
   },
   "scripts": {
     "test": "jest"
