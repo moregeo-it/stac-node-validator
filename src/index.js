@@ -104,14 +104,14 @@ async function validate(data, config) {
 			data = data.collections;
 			report.apiList = true;
 			if (config.verbose) {
-				report.messages.push(`The file is a CollectionCollection. Validating all ${entries.length} collections, but ignoring the other parts of the response.`);
+				report.messages.push(`The file is a CollectionCollection. Validating all ${data.length} collections, but ignoring the other parts of the response.`);
 			}
 		}
 		else if (Array.isArray(data.features)) {
 			data = data.features;
 			report.apiList = true;
 			if (config.verbose) {
-				report.messages.push(`The file is a ItemCollection. Validating all ${entries.length} items, but ignoring the other parts of the response.`);
+				report.messages.push(`The file is a ItemCollection. Validating all ${data.length} items, but ignoring the other parts of the response.`);
 			}
 		}
 		else {
