@@ -1,0 +1,256 @@
+/* Custom styles for STAC Validator - moreGeo color scheme */
+:root {
+	--moregeo-blue: #0086FF;
+	--moregeo-blue-light: #4da6ff;
+	--moregeo-orange: #FFA600;
+	--moregeo-gray: #495057;
+	--moregeo-gradient: linear-gradient(135deg, #0086FF 0%, #FFA600 100%);
+}
+
+body {
+	background: var(--moregeo-gradient);
+	min-height: 100vh;
+	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+	border: none;
+	border-radius: 15px;
+	overflow: hidden;
+}
+
+.card-header {
+	background: var(--moregeo-gray) !important;
+	border-bottom: none;
+	padding: 2rem;
+}
+
+.card-title {
+	font-size: 2rem;
+	font-weight: 600;
+}
+
+/* Logo styling */
+.header-logo {
+    display: flex;
+    align-items: center;
+}
+
+.header-logo a {
+    text-decoration: none !important;
+}
+
+.header-logo a:hover {
+    text-decoration: none !important;
+}
+
+.header-logo a:focus {
+    outline: 2px solid white;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.logo-img {
+    height: 60px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.logo-img:hover {
+    transform: scale(1.05);
+}
+
+/* Link styling */
+a {
+    color: var(--moregeo-blue);
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--moregeo-orange);
+    text-decoration: underline;
+}
+
+a:focus {
+    outline: 2px solid var(--moregeo-blue);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* Header links remain white with underline */
+.card-header a {
+    color: white;
+    text-decoration: underline;
+}
+
+.card-header a:hover {
+    color: var(--moregeo-orange);
+    text-decoration: underline;
+}
+
+.card-header a:focus {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
+.card-body {
+	padding: 2rem;
+}
+
+.input-group-text {
+	background-color: #f8f9fa;
+	border-color: #dee2e6;
+}
+
+.form-control {
+	border-color: #dee2e6;
+	padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+	border-color: var(--moregeo-blue);
+	box-shadow: 0 0 0 0.2rem rgba(0, 134, 255, 0.25);
+}
+
+.alert {
+	border: none;
+	border-radius: 10px;
+	padding: 1rem 1.5rem;
+}
+
+.alert-danger {
+	background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+	color: #c62828;
+	border: 1px solid #f44336;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    color: var(--moregeo-blue);
+}
+
+.fade-in {
+	animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.card-header {
+		padding: 1.5rem;
+	}
+
+	.card-title {
+		font-size: 1.5rem;
+	}
+
+	.card-body {
+		padding: 1.5rem;
+	}
+}
+
+/* JSON textarea styles */
+#stacJson {
+	font-family: "Courier New", monospace;
+	font-size: 0.9rem;
+	background-color: #f8f9fa;
+	border: 2px solid #dee2e6;
+	border-radius: 8px;
+	resize: vertical;
+	min-height: 200px;
+}
+
+#stacJson:focus {
+	border-color: var(--moregeo-blue);
+	box-shadow: 0 0 0 0.2rem rgba(0, 134, 255, 0.25);
+	background-color: #fff;
+}
+
+/* Validation method toggle */
+.btn-check:checked + .btn-outline-primary {
+	background: var(--moregeo-blue) !important;
+	border-color: var(--moregeo-blue) !important;
+	color: white !important;
+}
+
+.btn-outline-primary {
+	border-color: var(--moregeo-blue) !important;
+	color: var(--moregeo-blue) !important;
+	background-color: white !important;
+	transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+	background: var(--moregeo-blue-light) !important;
+	border-color: var(--moregeo-blue-light) !important;
+	color: white !important;
+}
+
+.btn-outline-primary:focus {
+	box-shadow: 0 0 0 0.2rem rgba(0, 134, 255, 0.25) !important;
+	background: var(--moregeo-blue-light) !important;
+	border-color: var(--moregeo-blue-light) !important;
+	color: white !important;
+}
+
+.btn-outline-primary:active {
+	background: var(--moregeo-blue) !important;
+	border-color: var(--moregeo-blue) !important;
+	color: white !important;
+}
+
+/* Enhanced validation error styling */
+.validation-error {
+	background-color: #fff5f5;
+	border-left: 4px solid #dc3545;
+	padding: 1rem;
+	margin-bottom: 1rem;
+	border-radius: 0 8px 8px 0;
+}
+
+.validation-error h6 {
+	color: #dc3545;
+	margin-bottom: 0.5rem;
+	font-weight: 600;
+}
+
+.validation-error p {
+	color: #2d3748;
+	margin-bottom: 0.25rem;
+}
+
+.validation-error small {
+	color: #718096;
+	font-style: italic;
+}
+
+/* Validation results header styling */
+#results .card-header {
+    background: var(--moregeo-gray) !important;
+    color: white !important;
+    transition: background-color 0.3s ease;
+}
+
+#results .card-header.validation-success {
+    background: #28a745 !important;
+}
+
+#results .card-header.validation-error {
+    background: #dc3545 !important;
+}
+
+#results .card-header h5 {
+    color: white !important;
+}
