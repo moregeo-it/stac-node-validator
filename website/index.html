@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>STAC Online Checker</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link href="./styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="header-text">
+                  <h1 class="card-title mb-0">
+                    <i class="fas fa-check-circle me-2"></i>
+                    STAC Online Checker
+                  </h1>
+                  <p class="mb-0 mt-2">
+                    Finds problems in <a
+                      href="https://stacspec.org"
+                      target="_blank"
+                      >SpatioTemporal Asset Catalog (STAC)</a> files<br />
+                    Powered by stac-node-validator 
+                    <a class="mx-1" href="https://www.npmjs.com/package/stac-node-validator" target="_blank"><i class="fab fa-npm"></i></a>
+                    <a href="https://github.com/moregeo-it/stac-node-validator" target="_blank"><i class="fab fa-github"></i></a>
+                  </div>
+                </p>
+                <div class="header-logo">
+                  <a
+                    href="https://moregeo.it"
+                    target="_blank"
+                    class="text-decoration-none"
+                  >
+                    <img
+                      src="https://moregeo.it/logo.png"
+                      alt="moreGeo"
+                      class="logo-img"
+                    />
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <form id="validationForm">
+                <div class="mb-3">
+                  <div class="btn-group d-flex" role="group">
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="validationMethod"
+                      id="urlMethod"
+                      value="url"
+                      checked
+                    />
+                    <label class="btn btn-outline-primary" for="urlMethod">
+                      <i class="fas fa-link me-1"></i>URL
+                    </label>
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="validationMethod"
+                      id="jsonMethod"
+                      value="json"
+                    />
+                    <label class="btn btn-outline-primary" for="jsonMethod">
+                      <i class="fas fa-code me-1"></i>JSON
+                    </label>
+                  </div>
+                </div>
+
+                <div id="urlInput" class="mb-3">
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-link"></i>
+                    </span>
+                    <input
+                      type="url"
+                      class="form-control"
+                      id="stacUrl"
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <div class="form-text">
+                    Enter the URL of a STAC Catalog, Collection, or Item to validate
+                  </div>
+                </div>
+
+                <div id="jsonInput" class="mb-3 d-none">
+                  <label for="stacJson" class="form-label">STAC JSON</label>
+                  <textarea
+                    class="form-control"
+                    id="stacJson"
+                    rows="10"
+                    placeholder="Paste your STAC JSON here..."
+                  ></textarea>
+                  <div class="form-text">
+                    Paste the JSON content of a STAC Catalog, Collection, or
+                    Item
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-outline-primary" id="validateBtn">
+                  <i class="fas fa-play me-2"></i>
+                  Check STAC
+                </button>
+              </form>
+
+              <!-- Loading State -->
+              <div id="loadingState" class="text-center d-none mt-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Fetching and validating STAC file...</p>
+              </div>
+
+              <!-- Results -->
+              <div id="results" class="d-none mt-4">
+                <div class="card border-0 shadow">
+                  <div
+                    class="card-header d-flex justify-content-between align-items-center"
+                  >
+                    <h5 class="mb-0">
+                      <i class="fas fa-clipboard-check me-2"></i>
+                      Validation Results
+                    </h5>
+                    <div id="resultStatus"></div>
+                  </div>
+                  <div class="card-body">
+                    <div id="resultContent"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1/dist/axios.min.js"></script>
+    <script src="./dist/index.js"></script>
+    <script src="./validator.js"></script>
+  </body>
+</html>
