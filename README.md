@@ -49,6 +49,89 @@ Further options to add to the commands above:
 **Note on API support:** Validating lists of STAC items/collections (i.e. `GET /collections` and `GET /collections/:id/items`) is partially supported.
 It only checks the contained items/collections, but not the other parts of the response (e.g. `links`).
 
+## Browser Usage
+
+The validator is also available as a browser bundle that can be used directly in web browsers without Node.js.
+
+### Installation
+
+#### CDN (Recommended)
+
+```html
+<script src="https://github.com/moregeo-it/stac-node-validator/releases/latest/download/index.js"></script>
+```
+
+#### Download
+
+Download the `index.js` file from the [latest release](https://github.com/moregeo-it/stac-node-validator/releases/latest) and include it in your HTML:
+
+```html
+<script src="./path/to/index.js"></script>
+```
+
+### Browser Usage Example
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://github.com/moregeo-it/stac-node-validator/releases/latest/download/index.js"></script>
+</head>
+<body>
+    <script>
+        // Create validator instance
+        const validator = new STACValidator();
+        
+        // Example STAC catalog
+        const stacCatalog = {
+            "stac_version": "1.0.0",
+            "type": "Catalog",
+            "id": "example-catalog",
+            "title": "Example Catalog",
+            "description": "This is an example catalog",
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "./catalog.json"
+                }
+            ]
+        };
+        
+        // Validate the STAC object
+        validator.validate(stacCatalog).then(report => {
+            console.log('Validation result:', report);
+            console.log('Is valid:', report.valid);
+            if (!report.valid) {
+                console.log('Errors:', report.messages);
+            }
+        }).catch(error => {
+            console.error('Validation error:', error);
+        });
+    </script>
+</body>
+</html>
+```
+
+See [example.html](./example.html) for a complete working example.
+
+### API
+
+The browser version exposes the same API as the Node.js version:
+
+```javascript
+// Create validator with options
+const validator = new STACValidator({
+    schemas: 'https://schemas.stacspec.org/v1.0.0', // optional
+    strict: false, // optional
+    // Note: some options like custom loaders may not work in browser
+});
+
+// Validate a STAC object
+validator.validate(stacObject).then(report => {
+    // Handle validation result
+});
+```
+
 ### Config file
 
 You can also pass a config file via the `--config` option. Simply pass a file path as value.
@@ -65,8 +148,37 @@ The schema map is an object instead of string separated with a `=` character.
 3. `npm install` to install dependencies
 4. Run the commands as above, but replace `stac-node-validator` with `node bin/cli.js`, for example `node bin/cli.js /path/to/your/file.json`
 
+#### Browser Bundle Development
+
+To work on the browser bundle:
+
+1. `npm run build:dev` - Build the bundle in development mode
+2. `npm run serve` - Start a local server to test the bundle
+3. Open `http://localhost:8080/example.html` in your browser to test the bundle
+4. `npm run build` - Build the production bundle
+
+The browser bundle is built using Webpack and includes polyfills for Node.js modules to ensure compatibility with browsers.
+
 ### Test
 
 Simply run `npm test` in a working [development environment](#development).
 
 If you want to disable tests for your fork of the repository, simply delete `.github/workflows/test.yaml`.
+
+### Release Process
+
+The project uses GitHub Actions for automated releases:
+
+1. **Testing**: All pull requests and pushes to master trigger the test suite across multiple Node.js versions and operating systems.
+2. **Browser Bundle Testing**: The test suite also validates that the browser bundle can be built successfully.
+3. **Release**: When a new tag is pushed (format: `v*`), the release workflow automatically:
+   - Runs all tests
+   - Builds the browser bundle
+   - Creates a GitHub release with the browser bundle as an asset
+   - Publishes the package to npm
+
+To create a new release:
+
+1. Update the version in `package.json`
+2. Create and push a git tag: `git tag v2.0.0-beta.19 && git push origin v2.0.0-beta.19`
+3. The release workflow will automatically handle the rest

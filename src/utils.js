@@ -1,7 +1,7 @@
 const Ajv = require('ajv');
 const addFormats = require('ajv-formats');
 const iriFormats = require('./iri');
-const path = require('path');
+const { join } = require('path');
 
 const SUPPORTED_PROTOCOLS = ['http:', 'https:'];
 
@@ -61,7 +61,7 @@ async function loadSchemaFromUri(uri, config) {
 		const match = patterns.find(map => uri.startsWith(map[0]));
 		if (match) {
 			const [pattern, target] = match;
-			newUri = path.join(target, uri.substring(pattern.length));
+			newUri = join(target, uri.substring(pattern.length));
 		}
 	}
 	if (config.schemas) {
@@ -74,8 +74,8 @@ async function loadSchemaFromUri(uri, config) {
 	return schema;
 }
 
-function normalizePath(path) {
-	return path.replace(/\\/g, '/').replace(/\/$/, "");
+function normalizePath(p) {
+	return p.replace(/\\/g, '/').replace(/\/$/, "");
 }
 
 function getSummary(result, config) {
