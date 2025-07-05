@@ -48,7 +48,7 @@ it('Should print help', async () => {
 
 	expect(consoleLogSpy.mock.calls[0][0]).toContain(initString);
 	expect(consoleLogSpy.mock.calls[1][0]).toContain("For more information on using this command line tool, please visit");
-	expect(consoleLogSpy.mock.calls[2][0]).toContain("https://github.com/stac-utils/stac-node-validator/blob/master/README.md#usage");
+	expect(consoleLogSpy.mock.calls[2][0]).toContain("https://github.com/moregeo-it/stac-node-validator/blob/master/README.md#usage");
 	expect(mockExit).toHaveBeenCalledWith(0);
 });
 

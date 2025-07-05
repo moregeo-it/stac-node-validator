@@ -4,7 +4,7 @@ There are - as far as I know - three maintained validators available for STAC:
 
 1. The original [Python validator](https://github.com/sparkgeo/stac-validator)
 2. The validation functionality shipped with [PySTAC](https://github.com/stac-utils/pystac)
-3. [This Node/JavaScript validator](https://github.com/stac-utils/stac-node-validator)
+3. [This Node/JavaScript validator](https://github.com/moregeo-it/stac-node-validator)
 
 Additionally I found some tools that seem to be unmaintained: [1](https://github.com/brianbancroft/stac-validator-cli) [2](https://github.com/JamesOConnor/stac-validator)
 

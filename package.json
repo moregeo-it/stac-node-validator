@@ -8,13 +8,13 @@
     "stac",
     "validator"
   ],
-  "homepage": "https://github.com/stac-utils/stac-node-validator",
+  "homepage": "https://github.com/moregeo-it/stac-node-validator",
   "bugs": {
-    "url": "https://github.com/stac-utils/stac-node-validator/issues"
+    "url": "https://github.com/moregeo-it/stac-node-validator/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stac-utils/stac-node-validator.git"
+    "url": "git+https://github.com/moregeo-it/stac-node-validator.git"
   },
   "funding": {
     "type": "github",
