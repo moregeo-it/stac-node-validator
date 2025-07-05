@@ -2,18 +2,22 @@ name: Release
 
 on:
   release:
-    types: [published]
+    types:
+      - published
 
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
+          # see https://github.com/npm/cli/issues/6184
+          registry-url: 'https://registry.npmjs.org'
       - name: Install dependencies
         run: npm install
       - name: Run tests
@@ -21,6 +25,7 @@ jobs:
       - name: Build browser bundle
         run: npm run build
       - name: Publish to npm
-        run: npm publish
+        run: npm publish --provenance --tag latest
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
