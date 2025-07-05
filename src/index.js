@@ -3,7 +3,6 @@ const versions = require('compare-versions');
 const { createAjv, isHttpUrl, loadSchema, normalizePath, isObject } = require('./utils');
 const defaultLoader = require('./loader/default');
 const BaseValidator = require('./baseValidator');
-const Test = require('./test');
 
 /**
  * @typedef Config
