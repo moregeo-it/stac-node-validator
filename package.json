@@ -39,7 +39,7 @@
     "klaw": "^4.0.1",
     "stac-js": "^0.1.4",
     "uri-js": "^4.4.1",
-    "yargs": "^17.7.2"
+    "yargs": "^18.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.0",
