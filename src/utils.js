@@ -40,6 +40,7 @@ async function loadSchema(config, schemaId) {
 		return schema;
 	}
 
+	let json;
 	try {
 		json = await loadSchemaFromUri(schemaId, config);
 	} catch (error) {
