@@ -19,16 +19,14 @@ jobs:
           - ubuntu-latest
           - windows-latest
         node:
-          - '20'
-          - '22'
-          - '23'
-          - '24'
-          - 'lts/*'
+          - '22.1.0' # oldest supported version
+          - 'lts/*' # latest LTS version, currently v24
+          - 'latest' # latest stable version, currently v25
     runs-on: ${{ matrix.runner }}
     name: ${{ matrix.runner }} runner with Node.js ${{ matrix.node }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
