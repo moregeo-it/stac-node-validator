@@ -223,8 +223,13 @@ async function validateOne(source, config, report = null) {
 	}
 
 	if (config.customValidator) {
-		const { default: create } = await import('stac-js');
-		const stac = create(data, false, false);
+		let stac;
+		try {
+			const { default: create } = await import('stac-js');
+			stac = create(data, false, false);
+		} catch (error) {
+			stac = data;
+		}
 		await config.customValidator.testFn(report, async (report, test) => await config.customValidator.afterValidation(stac, test, report, config))
 	}
 

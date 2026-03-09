@@ -1,5 +1,9 @@
-// const { STAC } = require('stac-js');
 const Test = require('./test');
+try {
+	const { STAC } = require('stac-js');
+} catch (error) {
+	// stac-js is optional
+}
 
 class BaseValidator {
 
@@ -47,7 +51,7 @@ class BaseValidator {
 	 * You can either create a list of errors using the test interface
 	 * or just throw on the first error.
 	 * 
-	 * @param {STAC} data
+	 * @param {Object|STAC} data STAC object, optionally a stac-js object if the dependency is installed.
 	 * @param {Test} test
 	 * @param {import('.').Report} report
 	 * @param {import('.').Config} config
