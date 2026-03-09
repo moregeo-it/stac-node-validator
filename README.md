@@ -144,17 +144,14 @@ The `validate` function returns a `Report` object with the following structure:
 
 The validator is available as browser bundles for client-side validation:
 
-- **ESM bundle** (`dist/index.mjs`) — recommended. Requires `axios`, `ajv`, and `ajv-formats` as ESM imports.
-- **UMD bundle** (`dist/index.js`) — self-contained, all dependencies included.
+- **ESM bundle** (`dist/index.mjs`) — recommended, self-contained.
+- **UMD bundle** (`dist/index.js`) — deprecated, self-contained.
 
 #### CDN Usage (ESM)
 
 ```html
 <script type="module">
   import validate from 'https://cdn.jsdelivr.net/npm/stac-node-validator@2/dist/index.mjs';
-  import axios from 'https://esm.run/axios@1';
-  import Ajv from 'https://esm.run/ajv@8';
-  import addFormats from 'https://esm.run/ajv-formats@3';
 
   const result = await validate({
     stac_version: '1.0.0',

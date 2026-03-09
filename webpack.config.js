@@ -72,7 +72,7 @@ const umd = {
   },
 };
 
-// ESM bundle (default, dependencies are external)
+// ESM bundle (self-contained, all dependencies bundled)
 const esm = {
   ...shared,
   entry: './src/index.js',
@@ -82,11 +82,6 @@ const esm = {
     library: {
       type: 'module',
     },
-  },
-  externals: {
-    axios: 'axios',
-    ajv: 'ajv',
-    'ajv-formats': 'ajv-formats',
   },
   experiments: {
     outputModule: true,
