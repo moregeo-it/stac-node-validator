@@ -17,3 +17,4 @@ Thumbs.db
 
 # Build artifacts
 /dist/
+/test-results/

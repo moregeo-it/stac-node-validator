@@ -37,3 +37,7 @@ jobs:
         run: npm test
       - name: Build browser bundle
         run: npm run build
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run website tests
+        run: npm run test:website

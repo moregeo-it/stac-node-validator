@@ -378,6 +378,13 @@ Then you can import it from the `dist` folder.
 
 Simply run `npm test` in a working [development environment](#development).
 
+To run the website tests (requires [Playwright](https://playwright.dev/)):
+
+```bash
+npx playwright install --with-deps chromium
+npm run test:website
+```
+
 ### Linting & Formatting
 
 - **Lint:** `npm run lint` — runs [oxlint](https://oxc.rs/) and auto-fixes issues where possible

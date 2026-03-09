@@ -44,6 +44,7 @@
   "devDependencies": {
     "@babel/core": "^7.23.0",
     "@babel/preset-env": "^7.23.0",
+    "@playwright/test": "^1.58.2",
     "babel-loader": "^10.0.0",
     "jest": "^30.0.1",
     "oxlint": "^1.51.0",
@@ -58,6 +59,7 @@
   },
   "scripts": {
     "test": "jest",
+    "test:website": "npx playwright test",
     "lint": "oxlint --fix -c .oxlintrc.json ./src ./bin",
     "format": "prettier --write .",
     "build": "webpack --mode production"
