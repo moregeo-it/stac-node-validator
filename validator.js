@@ -1,7 +1,4 @@
 import validate from './dist/index.mjs';
-import axios from 'https://esm.run/axios@1';
-import Ajv from 'https://esm.run/ajv@8';
-import addFormats from 'https://esm.run/ajv-formats@3';
 
 // STAC Validator JavaScript using stac-node-validator bundle
 class STACValidator {
