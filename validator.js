@@ -271,17 +271,13 @@ class STACValidator {
 
     try {
       // Fetch the STAC content from the URL silently
-      const response = await axios.get(url, {
-        timeout: 5000, // 5 second timeout
-        headers: {
-          Accept: 'application/json',
-        },
-      });
+      const response = await axios.get(url, { timeout: 5000 });
+      const data = response.data;
 
       // Only populate if we got valid JSON and textarea is still empty
       const jsonTextarea = document.getElementById('stacJson');
-      if (response.data && typeof response.data === 'object' && jsonTextarea.value.trim() === '') {
-        jsonTextarea.value = JSON.stringify(response.data, null, 2);
+      if (data && typeof data === 'object' && jsonTextarea.value.trim() === '') {
+        jsonTextarea.value = JSON.stringify(data, null, 2);
       }
     } catch (error) {
       // Silently fail - don't show any errors to user
