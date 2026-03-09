@@ -8,11 +8,17 @@ try {
 class BaseValidator {
 
 	/**
-	 * 
+	 * Creates a new BaseValidator instance.
 	 */
 	constructor() {
 	}
 
+	/**
+	 * Customize the ajv JSON Schema validator instance before schemas are compiled.
+	 * 
+	 * @param {import('ajv').default} ajv
+	 * @returns {import('ajv').default}
+	 */
 	async createAjv(ajv) {
 		return ajv;
 	}
@@ -61,6 +67,12 @@ class BaseValidator {
 
 	}
 
+	/**
+	 * Runs a test function and collects any errors into the report.
+	 * 
+	 * @param {import('.').Report} report
+	 * @param {Function} fn - Async function receiving (report, test) as arguments.
+	 */
 	async testFn(report, fn) {
 		let errors = [];
 		try {
