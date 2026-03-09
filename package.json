@@ -8,6 +8,9 @@
     "stac",
     "validator"
   ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "homepage": "https://github.com/moregeo-it/stac-node-validator",
   "bugs": {
     "url": "https://github.com/moregeo-it/stac-node-validator/issues"

@@ -24,7 +24,7 @@ Two options:
 
 ### CLI
 
-Install a recent version of [node](https://nodejs.org) (>= 22.1.0) and npm.
+Install a recent version of [node](https://nodejs.org) (>= 22.12.0) and npm.
 
 Then install the CLI on your computer:
 

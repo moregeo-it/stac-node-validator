@@ -19,7 +19,7 @@ jobs:
           - ubuntu-latest
           - windows-latest
         node:
-          - '22.1.0' # oldest supported version
+          - '22.12.0' # oldest supported version
           - 'lts/*' # latest LTS version, currently v24
           - 'latest' # latest stable version, currently v25
     runs-on: ${{ matrix.runner }}
