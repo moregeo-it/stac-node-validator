@@ -23,16 +23,18 @@ const BaseValidator = require('./baseValidator');
  * @property {string} type
  * @property {string} version
  * @property {boolean} valid
+ * @property {boolean} skipped
  * @property {Array.<string>} messages
  * @property {Array.<Report>} children
  * @property {Results} results
  * @property {boolean} apiList
+ * @property {string|null} source
  */
 
 /**
  * @typedef Results
  * @type {Object}
- * @property {OArray.<Error>} core
+ * @property {Array.<Error>} core
  * @property {Object.<string, Array.<Error>>} extensions
  * @property {Array.<Error>} custom
  */
@@ -55,6 +57,7 @@ function createReport() {
       custom: [],
     },
     apiList: false,
+    source: null,
   };
   return result;
 }
@@ -93,6 +96,7 @@ async function validate(data, config) {
 
   let report = createReport();
   if (typeof data === 'string') {
+    report.source = data;
     report.id = normalizePath(data);
     data = await loadAndReport(config, data, report);
   }
@@ -135,27 +139,25 @@ async function validate(data, config) {
 }
 
 /**
- * @param {Object|string} source The data to validate
+ * @param {Object|string} data The data to validate (file path or loaded object)
  * @param {Config} config The configuration object
- * @param {Report} report Parent report
+ * @param {Report} [report] Parent report
  * @returns {Report}
  */
-async function validateOne(source, config, report = null) {
+async function validateOne(data, config, report = null) {
   if (!report) {
     report = createReport();
   }
 
-  let data = source;
-  if (!report.id) {
-    if (typeof data === 'string') {
-      report.id = normalizePath(data);
-      data = await loadAndReport(config, data, report);
-      if (report.valid === false) {
-        return report;
-      }
-    } else {
-      report.id = data.id;
+  if (typeof data === 'string') {
+    report.source = data;
+    report.id = normalizePath(data);
+    data = await loadAndReport(config, data, report);
+    if (report.valid === false) {
+      return report;
     }
+  } else if (!report.id) {
+    report.id = data.id;
   }
   report.version = data.stac_version;
   report.type = data.type;
@@ -165,7 +167,7 @@ async function validateOne(source, config, report = null) {
   }
 
   if (typeof config.lintFn === 'function') {
-    report = await config.lintFn(source, report, config);
+    report = await config.lintFn(report, config);
   }
 
   if (config.customValidator) {
@@ -250,6 +252,7 @@ async function validateSchema(key, schema, data, report, config) {
   switch (schema) {
     case 'Feature':
       schema = 'Item';
+    // falls through
     case 'Catalog':
     case 'Collection':
       let type = schema.toLowerCase();

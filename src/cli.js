@@ -3,7 +3,7 @@ const path = require('path');
 const { version } = require('../package.json');
 const ConfigSource = require('./config.js');
 const validate = require('../src/index.js');
-const { printConfig, printSummary, resolveFiles, printReport, abort } = require('./nodeUtils');
+const { printConfig, printLint, printSummary, resolveFiles, printReport, abort } = require('./nodeUtils');
 const nodeLoader = require('./loader/node');
 const { getSummary, normalizePath } = require('./utils');
 const lint = require('./lint');
@@ -42,6 +42,7 @@ async function run() {
     const error = files.error[file];
     console.warn(`${file}: Can't be validated for the following reason: ${error}`);
   }
+  let data;
   if (files.files.length === 0) {
     abort('No files found that are suitable for validation.');
   } else if (files.files.length === 1) {
@@ -67,9 +68,9 @@ async function run() {
   }
 
   if (config.lint || config.format) {
-    config.lintFn = async (data, report, config) => {
+    config.lintFn = async (report, config) => {
       if (!report.apiList) {
-        report.lint = await lint(data, config);
+        report.lint = await lint(report.source, config);
         if (report.lint && !report.lint.valid) {
           report.valid = false;
         }

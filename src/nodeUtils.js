@@ -215,8 +215,24 @@ function strArrayToObject(list, sep = '=') {
   return map;
 }
 
+// This is taken from stac-fields package
+function formatKey(key, prefix = false) {
+  if (key.includes('/')) {
+    // Slashes are strong indicators for URIs or media types, don't format
+    return key;
+  }
+  if (prefix === false) {
+    key = key.replace(/^[\w-]+:/i, '');
+  }
+  return key
+    .split(/[:_\-\s]/g)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
 module.exports = {
   abort,
+  formatKey,
   printConfig,
   printReport,
   printSummary,

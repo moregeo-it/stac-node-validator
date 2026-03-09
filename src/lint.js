@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const { diffStringsUnified } = require('jest-diff');
-const { isHttpUrl, isObject } = require('./utils');
+const { isHttpUrl } = require('./utils');
 
 /**
  * @typedef LintResult
@@ -17,9 +17,7 @@ const { isHttpUrl, isObject } = require('./utils');
  * @returns {LintResult}
  */
 async function lint(file, config) {
-  if (isObject(file)) {
-    return null;
-  } else if (isHttpUrl(file)) {
+  if (!file || isHttpUrl(file)) {
     return null;
   }
 
@@ -51,7 +49,7 @@ async function lint(file, config) {
 
 function normalizeNewline(str) {
   // 2 spaces, *nix newlines, newline at end of file
-  return str.trimRight().replace(/(\r\n|\r)/g, '\n') + '\n';
+  return str.trimEnd().replace(/(\r\n|\r)/g, '\n') + '\n';
 }
 
 module.exports = lint;

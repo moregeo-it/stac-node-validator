@@ -2,8 +2,6 @@
 
 Simple proof-of-concept to validate STAC Items, Catalogs, Collections and core extensions with node.
 
-See the [STAC Validator Comparison](COMPARISON.md) for the features supported by this validator and the others out there.
-
 ## Versions
 
 **Current version:** 2.0.0-rc.2
@@ -39,8 +37,7 @@ npm install -g stac-node-validator
 
 Instead of paths to local files, you can also use HTTP(S) URLs. Other protocols such as S3 are not supported yet.
 
-- Validate a single folder (considers all `json` files in the `examples` folder): `stac-node-validator ./stac-spec`
-- Validate a single folder (considers all `json` files the given folder): `stac-node-validator ./stac-spec --all`
+- Validate a single folder (considers all `json` and `geojson` files in the given folder and all sub-folders): `stac-node-validator ./stac-spec`
 
 Further options to add to the commands above:
 
@@ -49,6 +46,7 @@ Further options to add to the commands above:
 - To not verify SSL/TLS certificates: `--ignoreCerts`
 - Add `--verbose` to get a more detailed output
 - Add `--strict` to enable strict mode in validation for schemas and numbers (as defined by [ajv](https://ajv.js.org/strict-mode.html) for options `strictSchema`, `strictNumbers` and `strictTuples`)
+- To set the depth for folder traversal: `--depth 0` (0 = no sub-folders, -1 = unlimited, default: -1)
 - To lint local JSON files: `--lint` (add `--verbose` to get a diff with the changes required)
 - To format / pretty-print local JSON files: `--format` (Attention: this will override the source files without warning!)
 - To run custom validation code: `--custom ./path/to/validation.js` - The validation.js needs to contain a class that implements the `BaseValidator` interface. See [custom.example.js](./custom.example.js) for an example.
@@ -160,7 +158,8 @@ The `validate` function returns a `Report` object with the following structure:
     extensions: {},   // Extension validation errors (by schema URL)
     custom: []        // Custom validation errors
   },
-  apiList: false      // Whether this is an API collection response
+  apiList: false,     // Whether this is an API collection response
+  source: null        // Original file path (null for objects)
 }
 ```
 

@@ -1,0 +1,5 @@
+{  "stac_version":"1.0.0",
+"id":"example","type":"Catalog",
+  "title":"Malformed Catalog",
+"description":"Bad indentation",
+"links":[]}
