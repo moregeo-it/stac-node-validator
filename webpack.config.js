@@ -1,21 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
 
-module.exports = {
-  entry: './src/index.js',
-  output: {
-    filename: 'index.js',
-    path: path.resolve(__dirname, 'dist'),
-    library: 'validate',
-    libraryTarget: 'umd',
-    globalObject: 'this',
-  },
+const shared = {
   mode: 'production',
-  externals: {
-    axios: 'axios',
-    ajv: 'Ajv',
-    'ajv-formats': 'addFormats',
-  },
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
@@ -71,3 +58,39 @@ module.exports = {
     minimize: true,
   },
 };
+
+// UMD bundle (self-contained, all dependencies bundled)
+const umd = {
+  ...shared,
+  entry: './src/index.js',
+  output: {
+    filename: 'index.js',
+    path: path.resolve(__dirname, 'dist'),
+    library: 'validate',
+    libraryTarget: 'umd',
+    globalObject: 'this',
+  },
+};
+
+// ESM bundle (default, dependencies are external)
+const esm = {
+  ...shared,
+  entry: './src/index.js',
+  output: {
+    filename: 'index.mjs',
+    path: path.resolve(__dirname, 'dist'),
+    library: {
+      type: 'module',
+    },
+  },
+  externals: {
+    axios: 'axios',
+    ajv: 'ajv',
+    'ajv-formats': 'ajv-formats',
+  },
+  experiments: {
+    outputModule: true,
+  },
+};
+
+module.exports = [umd, esm];

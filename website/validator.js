@@ -1,3 +1,8 @@
+import validate from './dist/index.mjs';
+import axios from 'https://esm.run/axios@1';
+import Ajv from 'https://esm.run/ajv@8';
+import addFormats from 'https://esm.run/ajv-formats@3';
+
 // STAC Validator JavaScript using stac-node-validator bundle
 class STACValidator {
   constructor() {
@@ -85,7 +90,6 @@ class STACValidator {
       this.showError(`Error fetching URL: ${error.message}`);
     }
   }
-
   async validateJSON() {
     const jsonText = document.getElementById('stacJson').value.trim();
 
@@ -109,12 +113,6 @@ class STACValidator {
 
   async performValidation(stacData) {
     try {
-      // Check if the validate function is available from the bundle
-      if (typeof validate === 'undefined') {
-        throw new Error('STAC validator bundle not loaded properly');
-      }
-
-      // Use the validate function from the bundle
       const report = await validate(stacData);
 
       // Convert the report to our results format
@@ -303,6 +301,8 @@ class STACValidator {
 }
 
 // Initialize the validator when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => new STACValidator());
+} else {
   new STACValidator();
-});
+}

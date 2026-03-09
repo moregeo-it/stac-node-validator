@@ -27,7 +27,8 @@
   "files": [
     "bin/cli.js",
     "src/",
-    "dist/*.js"
+    "dist/*.js",
+    "dist/*.mjs"
   ],
   "dependencies": {
     "ajv": "^8.17.1",

@@ -142,40 +142,54 @@ The `validate` function returns a `Report` object with the following structure:
 
 ### Browser
 
-The validator is also available as a browser bundle for client-side validation.
+The validator is available as browser bundles for client-side validation:
 
-#### CDN Usage
+- **ESM bundle** (`dist/index.mjs`) — recommended. Requires `axios`, `ajv`, and `ajv-formats` as ESM imports.
+- **UMD bundle** (`dist/index.js`) — self-contained, all dependencies included.
+
+#### CDN Usage (ESM)
 
 ```html
-<!-- Include axios for HTTP requests -->
-<script src="https://cdn.jsdelivr.net/npm/axios@1/dist/axios.min.js"></script>
-<!-- Include ajv for JSON Schema validation -->
-<script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ajv-formats@3/dist/index.min.js"></script>
-<!-- Include the STAC validator bundle -->
+<script type="module">
+  import validate from 'https://cdn.jsdelivr.net/npm/stac-node-validator@2/dist/index.mjs';
+  import axios from 'https://esm.run/axios@1';
+  import Ajv from 'https://esm.run/ajv@8';
+  import addFormats from 'https://esm.run/ajv-formats@3';
+
+  const result = await validate({
+    stac_version: '1.0.0',
+    type: 'Catalog',
+    id: 'my-catalog',
+    description: 'A sample catalog',
+    links: [],
+  });
+
+  if (result.valid) {
+    console.log('STAC is valid!');
+  } else {
+    console.log('Validation errors:', result.results.core);
+  }
+</script>
+```
+
+#### CDN Usage (UMD)
+
+```html
 <script src="https://cdn.jsdelivr.net/npm/stac-node-validator@2/dist/index.js"></script>
-
 <script>
-  // The validator is available as a global 'validate' function
-  async function validateSTAC() {
-    const stacData = {
-      stac_version: '1.0.0',
-      type: 'Catalog',
-      id: 'my-catalog',
-      description: 'A sample catalog',
-      links: [],
-    };
-
-    const result = await validate(stacData);
-
+  validate({
+    stac_version: '1.0.0',
+    type: 'Catalog',
+    id: 'my-catalog',
+    description: 'A sample catalog',
+    links: [],
+  }).then(function (result) {
     if (result.valid) {
       console.log('STAC is valid!');
     } else {
       console.log('Validation errors:', result.results.core);
     }
-  }
-
-  validateSTAC();
+  });
 </script>
 ```
 
