@@ -39,8 +39,6 @@
  *
  */
 
-/*! Axios v1.13.6 Copyright (c) 2026 Matt Zabriskie and contributors */
-
 /*! https://mths.be/punycode v1.4.0 by @mathias */
 
 /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */
