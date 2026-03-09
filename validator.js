@@ -1,4 +1,5 @@
 import validate from './dist/index.mjs';
+import axios from 'https://esm.run/axios@1';
 
 // STAC Validator JavaScript using stac-node-validator bundle
 class STACValidator {
