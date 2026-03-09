@@ -19,7 +19,7 @@ function printConfig(config) {
 
 function printSummary(summary) {
   console.group(`Summary (${summary.total})`);
-  console.log('Valid: ' + summary.valid);
+  console.log('Passed: ' + summary.valid);
   console.log('Invalid: ' + summary.invalid);
   if (summary.malformed !== null) {
     console.log('Malformed: ' + summary.malformed);
@@ -157,7 +157,7 @@ function printAjvValidationResult(result, category, reportValid, config) {
     }
     console.groupEnd();
   } else if (!reportValid || config.verbose) {
-    console.log(`${category}: valid`);
+    console.log(`${category}: passed`);
   }
 }
 

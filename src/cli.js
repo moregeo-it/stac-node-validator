@@ -9,8 +9,8 @@ const { getSummary, normalizePath } = require('./utils');
 const lint = require('./lint');
 
 async function run() {
-  console.log(`STAC Node Validator v${version}`);
-  console.log();
+  console.log(`STAC Node/JS Validator v${version}\n`);
+  console.warn('Warning: Schema-based STAC validation may be incomplete and should only be considered as a first indicator of validity.\n');
 
   // Read config from CLI and config file (if any)
   let config = ConfigSource.fromCLI();
