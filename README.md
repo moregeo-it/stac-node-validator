@@ -149,6 +149,9 @@ The validator is also available as a browser bundle for client-side validation.
 ```html
 <!-- Include axios for HTTP requests -->
 <script src="https://cdn.jsdelivr.net/npm/axios@1/dist/axios.min.js"></script>
+<!-- Include ajv for JSON Schema validation -->
+<script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ajv-formats@3/dist/index.min.js"></script>
 <!-- Include the STAC validator bundle -->
 <script src="https://cdn.jsdelivr.net/npm/stac-node-validator@2/dist/index.js"></script>
 

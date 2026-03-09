@@ -12,7 +12,9 @@ module.exports = {
   },
   mode: 'production',
   externals: {
-    'axios': 'axios'
+    'axios': 'axios',
+		'ajv': 'Ajv',
+		'ajv-formats': 'addFormats',
   },
   plugins: [
     new webpack.DefinePlugin({
