@@ -2,9 +2,6 @@
 
 module.exports = {
   collectCoverage: true,
-  coverageProvider: "v8",
-	testMatch: [
-		"**/tests/*.test.js",
-	],
-	
+  coverageProvider: 'v8',
+  testMatch: ['**/tests/*.test.js'],
 };

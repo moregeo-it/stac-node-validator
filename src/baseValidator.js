@@ -1,94 +1,90 @@
 const Test = require('./test');
 try {
-	const { STAC } = require('stac-js');
+  // eslint-disable-next-line no-unused-vars -- imported for JSDoc type
+  const { STAC } = require('stac-js');
 } catch (error) {
-	// stac-js is optional
+  // stac-js is optional
 }
 
 class BaseValidator {
+  /**
+   * Creates a new BaseValidator instance.
+   */
+  constructor() {}
 
-	/**
-	 * Creates a new BaseValidator instance.
-	 */
-	constructor() {
-	}
+  /**
+   * Customize the ajv JSON Schema validator instance before schemas are compiled.
+   *
+   * @param {import('ajv').default} ajv
+   * @returns {import('ajv').default}
+   */
+  async createAjv(ajv) {
+    return ajv;
+  }
 
-	/**
-	 * Customize the ajv JSON Schema validator instance before schemas are compiled.
-	 * 
-	 * @param {import('ajv').default} ajv
-	 * @returns {import('ajv').default}
-	 */
-	async createAjv(ajv) {
-		return ajv;
-	}
+  /**
+   * Any preprocessing work you want to do on the data.
+   *
+   * @param {Object} data
+   * @param {import('.').Report} report
+   * @param {import('.').Config} config
+   * @returns {Object}
+   */
+  async afterLoading(data, report, config) {
+    return data;
+  }
 
-	/**
-	 * Any preprocessing work you want to do on the data.
-	 * 
-	 * @param {Object} data
-	 * @param {import('.').Report} report
-	 * @param {import('.').Config} config
-	 * @returns {Object}
-	 */
-	async afterLoading(data, report, config) {
-		return data;
-	}
+  /**
+   * Bypass the STAC validation, do something different but still return a report.
+   *
+   * Could be used to validate against a different schema, e.g. OGC API - Records.
+   *
+   * Return a Report to bypass validation, or null to continue with STAC validation.
+   *
+   * @param {Object} data
+   * @param {import('.').Report} report
+   * @param {import('.').Config} config
+   * @returns {import('.').Report|null}
+   */
+  async bypassValidation(data, report, config) {
+    return null;
+  }
 
-	/**
-	 * Bypass the STAC validation, do something different but still return a report.
-	 * 
-	 * Could be used to validate against a different schema, e.g. OGC API - Records.
-	 * 
-	 * Return a Report to bypass validation, or null to continue with STAC validation.
-	 * 
-	 * @param {Object} data
-	 * @param {import('.').Report} report
-	 * @param {import('.').Config} config
-	 * @returns {import('.').Report|null}
-	 */
-	async bypassValidation(data, report, config) {
-		return null;
-	}
+  /**
+   * Any custom validation routines you want to run.
+   *
+   * You can either create a list of errors using the test interface
+   * or just throw on the first error.
+   *
+   * @param {Object|STAC} data STAC object, optionally a stac-js object if the dependency is installed.
+   * @param {Test} test
+   * @param {import('.').Report} report
+   * @param {import('.').Config} config
+   * @throws {Error}
+   */
+  async afterValidation(data, test, report, config) {}
 
-	/**
-	 * Any custom validation routines you want to run.
-	 * 
-	 * You can either create a list of errors using the test interface
-	 * or just throw on the first error.
-	 * 
-	 * @param {Object|STAC} data STAC object, optionally a stac-js object if the dependency is installed.
-	 * @param {Test} test
-	 * @param {import('.').Report} report
-	 * @param {import('.').Config} config
-	 * @throws {Error}
-	 */
-	async afterValidation(data, test, report, config) {
-
-	}
-
-	/**
-	 * Runs a test function and collects any errors into the report.
-	 * 
-	 * @param {import('.').Report} report
-	 * @param {Function} fn - Async function receiving (report, test) as arguments.
-	 */
-	async testFn(report, fn) {
-		let errors = [];
-		try {
-			const test = new Test();
-			await fn(report, test);
-			errors = test.errors;
-		} catch (error) {
-			errors = [error];
-		} finally {
-			report.results.custom = (report.results.custom || []).concat(errors);
-			if (errors.length > 0) {
-				report.valid = false;
-			}
-		}
-	}
-
+  /**
+   * Runs a test function and collects any errors into the report.
+   *
+   * @param {import('.').Report} report
+   * @param {Function} fn - Async function receiving (report, test) as arguments.
+   */
+  async testFn(report, fn) {
+    let errors = [];
+    try {
+      const test = new Test();
+      await fn(report, test);
+      errors = test.errors;
+    } catch (error) {
+      errors = [error];
+    } finally {
+      report.results.custom = (report.results.custom || []).concat(errors);
+      if (errors.length > 0) {
+        report.valid = false;
+      }
+    }
+  }
 }
 
 module.exports = BaseValidator;

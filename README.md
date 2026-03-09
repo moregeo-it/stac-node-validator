@@ -82,7 +82,7 @@ const validate = require('stac-node-validator');
 
 // Add any options, e.g. strict mode
 const config = {
-  strict: true
+  strict: true,
 };
 
 // Validate a STAC file from a URL
@@ -104,7 +104,7 @@ const nodeLoader = require('stac-node-validator/src/loader/node');
 
 // Add any options
 const config = {
-  loader: nodeLoader
+  loader: nodeLoader,
 };
 
 // Validate a STAC file from a URL
@@ -156,26 +156,26 @@ The validator is also available as a browser bundle for client-side validation.
 <script src="https://cdn.jsdelivr.net/npm/stac-node-validator@2/dist/index.js"></script>
 
 <script>
-// The validator is available as a global 'validate' function
-async function validateSTAC() {
-  const stacData = {
-    "stac_version": "1.0.0",
-    "type": "Catalog",
-    "id": "my-catalog",
-    "description": "A sample catalog",
-    "links": []
-  };
-  
-  const result = await validate(stacData);
-  
-  if (result.valid) {
-    console.log('STAC is valid!');
-  } else {
-    console.log('Validation errors:', result.results.core);
-  }
-}
+  // The validator is available as a global 'validate' function
+  async function validateSTAC() {
+    const stacData = {
+      stac_version: '1.0.0',
+      type: 'Catalog',
+      id: 'my-catalog',
+      description: 'A sample catalog',
+      links: [],
+    };
 
-validateSTAC();
+    const result = await validate(stacData);
+
+    if (result.valid) {
+      console.log('STAC is valid!');
+    } else {
+      console.log('Validation errors:', result.results.core);
+    }
+  }
+
+  validateSTAC();
 </script>
 ```
 
@@ -191,7 +191,6 @@ Create a JavaScript file that extends `BaseValidator` and override one or more l
 const BaseValidator = require('stac-node-validator/src/baseValidator.js');
 
 class CustomValidator extends BaseValidator {
-
   async afterValidation(data, test, report, config) {
     // data is the STAC object (a stac-js object if stac-js is installed)
     // test provides assertion methods to collect errors
@@ -201,7 +200,6 @@ class CustomValidator extends BaseValidator {
     test.truthy(typeof data.title === 'string', 'must have a title');
     test.equal(data.type, 'Collection', 'type must be Collection');
   }
-
 }
 
 module.exports = CustomValidator;
@@ -220,7 +218,7 @@ const validate = require('stac-node-validator');
 const CustomValidator = require('./my-validator.js');
 
 const config = {
-  customValidator: new CustomValidator()
+  customValidator: new CustomValidator(),
 };
 
 const result = await validate('/path/to/file.json', config);
@@ -310,26 +308,26 @@ async afterValidation(data, test, report, config) {
 
 The `test` object passed to `afterValidation` wraps Node's built-in [`assert`](https://nodejs.org/api/assert.html) module. Instead of throwing on the first failure, it collects all errors so you get a complete report. Available methods:
 
-| Method | Description |
-| --- | --- |
-| `test.truthy(value, message)` | Asserts that `value` is truthy |
-| `test.ok(value, message)` | Same as `truthy` |
-| `test.equal(actual, expected, message)` | Loose equality (`==`) |
-| `test.strictEqual(actual, expected, message)` | Strict equality (`===`) |
-| `test.deepEqual(actual, expected, message)` | Deep loose equality |
-| `test.deepStrictEqual(actual, expected, message)` | Deep strict equality |
-| `test.notEqual(actual, expected, message)` | Loose inequality |
-| `test.notStrictEqual(actual, expected, message)` | Strict inequality |
-| `test.notDeepEqual(actual, expected, message)` | Deep loose inequality |
-| `test.notDeepStrictEqual(actual, expected, message)` | Deep strict inequality |
-| `test.match(string, regexp, message)` | Asserts string matches regexp |
-| `test.doesNotMatch(string, regexp, message)` | Asserts string does not match regexp |
-| `test.fail(message)` | Unconditionally adds an error |
-| `test.ifError(value)` | Fails if `value` is truthy (useful for error objects) |
-| `test.throws(fn, expected, message)` | Asserts `fn` throws |
-| `test.doesNotThrow(fn, message)` | Asserts `fn` does not throw |
-| `test.rejects(asyncFn, expected, message)` | Asserts async function rejects |
-| `test.doesNotReject(asyncFn, message)` | Asserts async function does not reject |
+| Method                                               | Description                                           |
+| ---------------------------------------------------- | ----------------------------------------------------- |
+| `test.truthy(value, message)`                        | Asserts that `value` is truthy                        |
+| `test.ok(value, message)`                            | Same as `truthy`                                      |
+| `test.equal(actual, expected, message)`              | Loose equality (`==`)                                 |
+| `test.strictEqual(actual, expected, message)`        | Strict equality (`===`)                               |
+| `test.deepEqual(actual, expected, message)`          | Deep loose equality                                   |
+| `test.deepStrictEqual(actual, expected, message)`    | Deep strict equality                                  |
+| `test.notEqual(actual, expected, message)`           | Loose inequality                                      |
+| `test.notStrictEqual(actual, expected, message)`     | Strict inequality                                     |
+| `test.notDeepEqual(actual, expected, message)`       | Deep loose inequality                                 |
+| `test.notDeepStrictEqual(actual, expected, message)` | Deep strict inequality                                |
+| `test.match(string, regexp, message)`                | Asserts string matches regexp                         |
+| `test.doesNotMatch(string, regexp, message)`         | Asserts string does not match regexp                  |
+| `test.fail(message)`                                 | Unconditionally adds an error                         |
+| `test.ifError(value)`                                | Fails if `value` is truthy (useful for error objects) |
+| `test.throws(fn, expected, message)`                 | Asserts `fn` throws                                   |
+| `test.doesNotThrow(fn, message)`                     | Asserts `fn` does not throw                           |
+| `test.rejects(asyncFn, expected, message)`           | Asserts async function rejects                        |
+| `test.doesNotReject(asyncFn, message)`               | Asserts async function does not reject                |
 
 You can also simply `throw` an Error in any lifecycle method — it will be caught and added to `report.results.custom` as well.
 
@@ -339,7 +337,6 @@ You can use the constructor to initialize state that persists across validations
 
 ```javascript
 class CustomValidator extends BaseValidator {
-
   constructor() {
     super();
     this.ids = new Set();
@@ -350,7 +347,6 @@ class CustomValidator extends BaseValidator {
     test.truthy(!this.ids.has(data.id), `duplicate ID: ${data.id}`);
     this.ids.add(data.id);
   }
-
 }
 ```
 
@@ -370,3 +366,8 @@ Then you can import it from the `dist` folder.
 ### Tests
 
 Simply run `npm test` in a working [development environment](#development).
+
+### Linting & Formatting
+
+- **Lint:** `npm run lint` — runs [oxlint](https://oxc.rs/) and auto-fixes issues where possible
+- **Format:** `npm run format` — formats all files with [Prettier](https://prettier.io/)

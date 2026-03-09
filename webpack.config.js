@@ -12,9 +12,9 @@ module.exports = {
   },
   mode: 'production',
   externals: {
-    'axios': 'axios',
-		'ajv': 'Ajv',
-		'ajv-formats': 'addFormats',
+    axios: 'axios',
+    ajv: 'Ajv',
+    'ajv-formats': 'addFormats',
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -22,35 +22,35 @@ module.exports = {
     }),
     new webpack.ProvidePlugin({
       process: 'process/browser',
-    })
+    }),
   ],
   resolve: {
     fallback: {
       // Only polyfill what we actually need
-      'path': 'path-browserify',
+      path: 'path-browserify',
       // Disable everything else
-      'fs': false,
+      fs: false,
       'fs-extra': false,
-      'child_process': false,
-      'net': false,
-      'tls': false,
-      'os': false,
-      'crypto': false,
-      'stream': false,
-      'util': false,
-      'url': false,
-      'querystring': false,
-      'http': false,
-      'https': false,
-      'zlib': false,
-      'assert': false,
-      'buffer': false,
-      'events': false,
-      'timers': false,
-      'string_decoder': false,
-      'constants': false,
-      'vm': false
-    }
+      child_process: false,
+      net: false,
+      tls: false,
+      os: false,
+      crypto: false,
+      stream: false,
+      util: false,
+      url: false,
+      querystring: false,
+      http: false,
+      https: false,
+      zlib: false,
+      assert: false,
+      buffer: false,
+      events: false,
+      timers: false,
+      string_decoder: false,
+      constants: false,
+      vm: false,
+    },
   },
   module: {
     rules: [
@@ -60,14 +60,14 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env']
-          }
-        }
-      }
-    ]
+            presets: ['@babel/preset-env'],
+          },
+        },
+      },
+    ],
   },
   target: 'web',
   optimization: {
-    minimize: true
-  }
+    minimize: true,
+  },
 };

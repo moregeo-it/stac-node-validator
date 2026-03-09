@@ -15,46 +15,23 @@
         {
           "name": "Remote Data, Inc",
           "description": "Producers of awesome spatiotemporal assets",
-          "roles": [
-            "producer",
-            "processor"
-          ],
+          "roles": ["producer", "processor"],
           "url": "http://remotedata.io"
         }
       ],
       "extent": {
         "spatial": {
-          "bbox": [
-            [
-              172.91173669923782,
-              1.3438851951615003,
-              172.95469614953714,
-              1.3690476620161975
-            ]
-          ]
+          "bbox": [[172.91173669923782, 1.3438851951615003, 172.95469614953714, 1.3690476620161975]]
         },
         "temporal": {
-          "interval": [
-            [
-              "2020-12-11T22:38:32.125Z",
-              "2020-12-14T18:02:31.437Z"
-            ]
-          ]
+          "interval": [["2020-12-11T22:38:32.125Z", "2020-12-14T18:02:31.437Z"]]
         }
       },
       "license": "CC-BY-4.0",
       "summaries": {
-        "platform": [
-          "cool_sat1",
-          "cool_sat2"
-        ],
-        "constellation": [
-          "ion"
-        ],
-        "instruments": [
-          "cool_sensor_v1",
-          "cool_sensor_v2"
-        ]
+        "platform": ["cool_sat1", "cool_sat2"],
+        "constellation": ["ion"],
+        "instruments": ["cool_sensor_v1", "cool_sensor_v2"]
       },
       "links": [
         {
@@ -77,5 +54,5 @@
       ]
     }
   ],
-	"links": []
+  "links": []
 }
