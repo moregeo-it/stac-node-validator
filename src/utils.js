@@ -5,6 +5,13 @@ const { join } = require('path');
 
 const SUPPORTED_PROTOCOLS = ['http:', 'https:'];
 
+const SCHEMA_DRAFT_URLS = {
+  'http://json-schema.org/draft-07/schema#': 'draft-07',
+  'http://json-schema.org/draft-07/schema': 'draft-07',
+  'https://json-schema.org/draft/2019-09/schema': '2019-09',
+  'https://json-schema.org/draft/2020-12/schema': '2020-12',
+};
+
 function isObject(obj) {
   return typeof obj === 'object' && obj === Object(obj) && !Array.isArray(obj);
 }
@@ -17,8 +24,11 @@ function isHttpUrl(url) {
   return false;
 }
 
-function createAjv(config) {
-  let instance = new Ajv({
+function createAjv(config, AjvClass = null) {
+  if (!AjvClass) {
+    AjvClass = Ajv;
+  }
+  let instance = new AjvClass({
     formats: iriFormats,
     allErrors: config.verbose,
     strict: false,
@@ -34,6 +44,27 @@ function createAjv(config) {
   return instance;
 }
 
+function getAjvForSchema(config, schemaJson) {
+  if (!schemaJson.$schema) {
+    return config.ajv;
+  }
+  const draft = SCHEMA_DRAFT_URLS[schemaJson.$schema];
+  if (!draft || draft === 'draft-07') {
+    return config.ajv;
+  }
+  if (!isObject(config.schemaVersions) || !config.schemaVersions[draft]) {
+    return null;
+  }
+  // Lazily create and cache Ajv instances for other drafts
+  if (!config._ajvInstances) {
+    config._ajvInstances = {};
+  }
+  if (!config._ajvInstances[draft]) {
+    config._ajvInstances[draft] = createAjv(config, config.schemaVersions[draft]);
+  }
+  return config._ajvInstances[draft];
+}
+
 async function loadSchema(config, schemaId) {
   let schema = config.ajv.getSchema(schemaId);
   if (schema) {
@@ -47,12 +78,22 @@ async function loadSchema(config, schemaId) {
     throw new Error(`Schema at '${schemaId}' not found. Please ensure all entries in 'stac_extensions' are valid.`);
   }
 
-  schema = config.ajv.getSchema(json.$id);
+  // Determine the correct Ajv instance based on the schema's $schema draft
+  const ajv = getAjvForSchema(config, json);
+  if (!ajv) {
+    const draft = SCHEMA_DRAFT_URLS[json.$schema] || json.$schema;
+    throw new Error(
+      `Schema at '${schemaId}' uses JSON Schema ${draft}, which is not supported. ` +
+        'Pass the corresponding Ajv class via config.schemaVersions to enable support.',
+    );
+  }
+
+  schema = ajv.getSchema(json.$id);
   if (schema) {
     return schema;
   }
 
-  return await config.ajv.compileAsync(json);
+  return await ajv.compileAsync(json);
 }
 
 async function loadSchemaFromUri(uri, config) {
@@ -132,6 +173,7 @@ function makeAjvErrorMessage(error) {
 
 module.exports = {
   createAjv,
+  getAjvForSchema,
   getSummary,
   isObject,
   isHttpUrl,
@@ -139,5 +181,6 @@ module.exports = {
   loadSchemaFromUri,
   makeAjvErrorMessage,
   normalizePath,
+  SCHEMA_DRAFT_URLS,
   SUPPORTED_PROTOCOLS,
 };

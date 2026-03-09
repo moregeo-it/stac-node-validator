@@ -10,7 +10,9 @@ const lint = require('./lint');
 
 async function run() {
   console.log(`STAC Node/JS Validator v${version}\n`);
-  console.warn('Warning: Schema-based STAC validation may be incomplete and should only be considered as a first indicator of validity.\n');
+  console.warn(
+    'Warning: Schema-based STAC validation may be incomplete and should only be considered as a first indicator of validity.\n',
+  );
 
   // Read config from CLI and config file (if any)
   let config = ConfigSource.fromCLI();
@@ -81,6 +83,13 @@ async function run() {
     const validator = require(absPath);
     config.customValidator = new validator();
   }
+
+  // In Node, automatically enable JSON Schema 2019-09 and 2020-12 support
+  // (no bundle size concern in Node; browser users can opt-in via config.schemaVersions)
+  config.schemaVersions = {
+    '2019-09': require('ajv/dist/2019'),
+    '2020-12': require('ajv/dist/2020'),
+  };
 
   // Finally run validation
   const result = await validate(data, config);

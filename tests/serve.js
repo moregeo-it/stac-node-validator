@@ -10,7 +10,7 @@ const mimeTypes = {
   '.js': 'text/javascript',
   '.mjs': 'text/javascript',
   '.css': 'text/css',
-  '.json': 'application/json'
+  '.json': 'application/json',
 };
 
 const server = http.createServer((req, res) => {
@@ -47,7 +47,7 @@ const server = http.createServer((req, res) => {
     } else {
       res.writeHead(200, {
         'Content-Type': contentType,
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
       });
       res.end(content);
     }

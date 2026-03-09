@@ -1,4 +1,12 @@
-const { isObject, isHttpUrl, normalizePath, makeAjvErrorMessage } = require('../src/utils');
+const {
+  isObject,
+  isHttpUrl,
+  normalizePath,
+  makeAjvErrorMessage,
+  createAjv,
+  getAjvForSchema,
+  SCHEMA_DRAFT_URLS,
+} = require('../src/utils');
 const iri = require('../src/iri');
 
 describe('Utility functions', () => {
@@ -150,6 +158,71 @@ describe('IRI format validators', () => {
 
     it('Should reject non-strings', () => {
       expect(iri['iri-reference'](42)).toBe(false);
+    });
+  });
+});
+
+describe('JSON Schema draft detection', () => {
+  describe('SCHEMA_DRAFT_URLS', () => {
+    it('Should map draft-07 URLs', () => {
+      expect(SCHEMA_DRAFT_URLS['http://json-schema.org/draft-07/schema#']).toBe('draft-07');
+      expect(SCHEMA_DRAFT_URLS['http://json-schema.org/draft-07/schema']).toBe('draft-07');
+    });
+
+    it('Should map 2019-09 URL', () => {
+      expect(SCHEMA_DRAFT_URLS['https://json-schema.org/draft/2019-09/schema']).toBe('2019-09');
+    });
+
+    it('Should map 2020-12 URL', () => {
+      expect(SCHEMA_DRAFT_URLS['https://json-schema.org/draft/2020-12/schema']).toBe('2020-12');
+    });
+  });
+
+  describe('getAjvForSchema', () => {
+    const baseConfig = { ajv: { fake: true } };
+
+    it('Should return default ajv for schemas without $schema', () => {
+      const result = getAjvForSchema(baseConfig, { type: 'object' });
+      expect(result).toBe(baseConfig.ajv);
+    });
+
+    it('Should return default ajv for draft-07 schemas', () => {
+      const result = getAjvForSchema(baseConfig, { $schema: 'http://json-schema.org/draft-07/schema#' });
+      expect(result).toBe(baseConfig.ajv);
+    });
+
+    it('Should return null for 2019-09 when schemaVersions not provided', () => {
+      const result = getAjvForSchema(baseConfig, { $schema: 'https://json-schema.org/draft/2019-09/schema' });
+      expect(result).toBeNull();
+    });
+
+    it('Should return null for 2020-12 when schemaVersions not provided', () => {
+      const result = getAjvForSchema(baseConfig, { $schema: 'https://json-schema.org/draft/2020-12/schema' });
+      expect(result).toBeNull();
+    });
+
+    it('Should create and cache ajv instance for 2019-09 when class provided', () => {
+      const Ajv2019 = require('ajv/dist/2019');
+      const config = { ...baseConfig, schemaVersions: { '2019-09': Ajv2019 } };
+      const result = getAjvForSchema(config, { $schema: 'https://json-schema.org/draft/2019-09/schema' });
+      expect(result).toBeDefined();
+      expect(result).not.toBe(config.ajv);
+      // Should cache the instance
+      const result2 = getAjvForSchema(config, { $schema: 'https://json-schema.org/draft/2019-09/schema' });
+      expect(result2).toBe(result);
+    });
+
+    it('Should create and cache ajv instance for 2020-12 when class provided', () => {
+      const Ajv2020 = require('ajv/dist/2020');
+      const config = { ...baseConfig, schemaVersions: { '2020-12': Ajv2020 } };
+      const result = getAjvForSchema(config, { $schema: 'https://json-schema.org/draft/2020-12/schema' });
+      expect(result).toBeDefined();
+      expect(result).not.toBe(config.ajv);
+    });
+
+    it('Should return default ajv for unknown $schema values', () => {
+      const result = getAjvForSchema(baseConfig, { $schema: 'http://some-unknown-schema.org/draft/foo' });
+      expect(result).toBe(baseConfig.ajv);
     });
   });
 });

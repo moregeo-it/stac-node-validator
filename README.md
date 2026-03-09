@@ -118,6 +118,30 @@ if (result.valid) {
 }
 ```
 
+#### JSON Schema Versions
+
+By default, only JSON Schema draft-07 is supported (used by all core STAC schemas).
+Some extensions may use newer JSON Schema drafts (2019-09 or 2020-12).
+
+The **CLI** automatically supports all three drafts.
+
+For **programmatic use**, you can opt into newer drafts without affecting your bundle size
+when you don't need them. Pass the Ajv classes via `config.schemaVersions`:
+
+```javascript
+const validate = require('stac-node-validator');
+
+const result = await validate(data, {
+  schemaVersions: {
+    '2019-09': require('ajv/dist/2019'),
+    '2020-12': require('ajv/dist/2020'),
+  },
+});
+```
+
+If a schema requires a draft that isn't provided, the validator will report an error
+indicating which draft is needed.
+
 #### Validation Results
 
 The `validate` function returns a `Report` object with the following structure:

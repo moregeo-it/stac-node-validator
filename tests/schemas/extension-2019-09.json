@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "https://example.org/test-2019-09/schema.json",
+  "title": "Test Extension (2019-09)",
+  "type": "object",
+  "required": ["stac_version", "type"],
+  "properties": {
+    "properties": {
+      "type": "object",
+      "required": ["test:name"],
+      "properties": {
+        "test:name": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

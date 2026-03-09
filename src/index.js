@@ -12,6 +12,7 @@ const BaseValidator = require('./baseValidator');
  * @property {string|null} [schemas=null] Validate against schemas in a local or remote STAC folder.
  * @property {Object.<string, string>} [schemaMap={}] Validate against a specific local schema (e.g. an external extension). Provide the schema URI as key and the local path as value.
  * @property {boolean} [strict=false] Enable strict mode in validation for schemas and numbers (as defined by ajv for options `strictSchema`, `strictNumbers` and `strictTuples
+ * @property {Object.<string, function>} [schemaVersions={}] A map of JSON Schema draft versions to Ajv classes. Supported keys: '2019-09' and '2020-12'. When provided, schemas using these drafts will be validated with the corresponding Ajv class. Example: `{ '2019-09': require('ajv/dist/2019'), '2020-12': require('ajv/dist/2020') }`
  * @property {BaseValidator} [customValidator=null] A validator with custom rules.
  */
 

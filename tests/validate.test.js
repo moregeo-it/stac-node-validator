@@ -223,4 +223,104 @@ describe('Validate Function Tests', () => {
       expect(result.version).toBe('1.0.0');
     });
   });
+
+  describe('JSON Schema draft support via schemaVersions', () => {
+    const catalogWith2019Extension = {
+      stac_version: '1.0.0',
+      id: 'test-catalog-2019',
+      type: 'Catalog',
+      description: 'Catalog with 2019-09 extension',
+      links: [],
+      stac_extensions: ['https://example.org/test-2019-09/schema.json'],
+      properties: {
+        'test:name': 'hello',
+      },
+    };
+
+    it('Should error when extension uses 2019-09 and schemaVersions not provided', async () => {
+      const config = {
+        schemaMap: {
+          'https://example.org/test-2019-09/schema.json': 'tests/schemas/extension-2019-09.json',
+        },
+        loader: nodeLoader,
+      };
+      const result = await validate(catalogWith2019Extension, config);
+
+      expect(result.valid).toBe(false);
+      const extErrors = result.results.extensions['https://example.org/test-2019-09/schema.json'];
+      expect(extErrors).toBeDefined();
+      expect(extErrors.length).toBeGreaterThan(0);
+      expect(extErrors[0].message).toContain('2019-09');
+    });
+
+    it('Should validate successfully when schemaVersions includes 2019-09', async () => {
+      const Ajv2019 = require('ajv/dist/2019');
+      const config = {
+        schemaMap: {
+          'https://example.org/test-2019-09/schema.json': 'tests/schemas/extension-2019-09.json',
+        },
+        loader: nodeLoader,
+        schemaVersions: {
+          '2019-09': Ajv2019,
+        },
+      };
+      const result = await validate(catalogWith2019Extension, config);
+
+      expect(result.valid).toBe(true);
+      expect(result.type).toBe('Catalog');
+    });
+
+    it('Should validate draft-07 schemas normally when schemaVersions is provided', async () => {
+      const Ajv2019 = require('ajv/dist/2019');
+      const Ajv2020 = require('ajv/dist/2020');
+      const config = {
+        loader: nodeLoader,
+        schemaVersions: {
+          '2019-09': Ajv2019,
+          '2020-12': Ajv2020,
+        },
+      };
+      const result = await validate(validCatalogPath, config);
+
+      expect(result.valid).toBe(true);
+      expect(result.type).toBe('Catalog');
+    });
+
+    it('Should validate extensions using draft-07, 2019-09 and 2020-12 at the same time', async () => {
+      const Ajv2019 = require('ajv/dist/2019');
+      const Ajv2020 = require('ajv/dist/2020');
+      const catalogWithAllDrafts = {
+        stac_version: '1.0.0',
+        id: 'test-catalog-all-drafts',
+        type: 'Catalog',
+        description: 'Catalog with extensions across all three JSON Schema drafts',
+        links: [],
+        stac_extensions: [
+          'https://example.org/test-2019-09/schema.json',
+          'https://example.org/test-2020-12/schema.json',
+        ],
+        properties: {
+          'test:name': 'hello',
+          'test:label': 'world',
+        },
+      };
+      const config = {
+        schemaMap: {
+          'https://example.org/test-2019-09/schema.json': 'tests/schemas/extension-2019-09.json',
+          'https://example.org/test-2020-12/schema.json': 'tests/schemas/extension-2020-12.json',
+        },
+        loader: nodeLoader,
+        schemaVersions: {
+          '2019-09': Ajv2019,
+          '2020-12': Ajv2020,
+        },
+      };
+      const result = await validate(catalogWithAllDrafts, config);
+
+      expect(result.valid).toBe(true);
+      expect(result.type).toBe('Catalog');
+      expect(result.results.extensions['https://example.org/test-2019-09/schema.json']).toEqual([]);
+      expect(result.results.extensions['https://example.org/test-2020-12/schema.json']).toEqual([]);
+    });
+  });
 });

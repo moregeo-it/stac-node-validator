@@ -1,19 +1,27 @@
 const { test, expect } = require('@playwright/test');
 
-const validCatalog = JSON.stringify({
-  stac_version: '1.0.0',
-  id: 'test-catalog',
-  type: 'Catalog',
-  description: 'A test catalog',
-  links: []
-}, null, 2);
+const validCatalog = JSON.stringify(
+  {
+    stac_version: '1.0.0',
+    id: 'test-catalog',
+    type: 'Catalog',
+    description: 'A test catalog',
+    links: [],
+  },
+  null,
+  2,
+);
 
-const invalidCatalog = JSON.stringify({
-  stac_version: '1.0.0',
-  id: 'test-catalog',
-  type: 'Catalog',
-  description: 'Missing links'
-}, null, 2);
+const invalidCatalog = JSON.stringify(
+  {
+    stac_version: '1.0.0',
+    id: 'test-catalog',
+    type: 'Catalog',
+    description: 'Missing links',
+  },
+  null,
+  2,
+);
 
 test.describe('Website UI', () => {
   test('Should load without errors', async ({ page }) => {
@@ -114,13 +122,17 @@ test.describe('Website UI', () => {
   test('Should show error for unsupported STAC version', async ({ page }) => {
     await page.goto('/');
 
-    const oldCatalog = JSON.stringify({
-      stac_version: '0.9.0',
-      id: 'old',
-      type: 'Catalog',
-      description: 'Old catalog',
-      links: []
-    }, null, 2);
+    const oldCatalog = JSON.stringify(
+      {
+        stac_version: '0.9.0',
+        id: 'old',
+        type: 'Catalog',
+        description: 'Old catalog',
+        links: [],
+      },
+      null,
+      2,
+    );
 
     await page.locator('label[for="jsonMethod"]').click();
     await page.locator('#stacJson').fill(oldCatalog);
