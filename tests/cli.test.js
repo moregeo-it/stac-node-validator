@@ -244,6 +244,13 @@ describe('CLI Parameter Tests', () => {
       expect(exitCode).toBe(1);
       expect(stderr).toContain('Config file does not exist');
     });
+
+    it('Should let CLI options override config file options', async () => {
+      // The config file points at the valid catalog, but the invalid file passed on the CLI takes precedence
+      const { exitCode, stdout } = await runCLI([INVALID_CATALOG, '--config', CONFIG_FILE]);
+      expect(exitCode).toBe(1);
+      expect(stdout).toContain('Invalid: 1');
+    });
   });
 
   describe('--ignoreCerts', () => {

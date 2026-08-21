@@ -42,7 +42,7 @@ Instead of paths to local files, you can also use HTTP(S) URLs. Other protocols 
 Further options to add to the commands above:
 
 - To validate against schemas in a local STAC folder (e.g. `dev` branch): `--schemas /path/to/stac/folder`
-- To validate against a specific local schema (e.g. an external extension): `--schemaMap https://stac-extensions.github.io/foobar/v1.0.0/schema.json=./json-schema/schema.json`
+- To validate against a specific local schema (e.g. an external extension): `--schemaMap https://stac-extensions.github.io/foobar/v1.0.0/schema.json=./json-schema/schema.json`. You can also map a partial URL to a local folder so that all children are mapped, e.g. `--schemaMap https://stac-extensions.github.io/foobar/=./json-schema/`.
 - To not verify SSL/TLS certificates: `--ignoreCerts`
 - Add `--verbose` to get a more detailed output
 - Add `--strict` to enable strict mode in validation for schemas and numbers (as defined by [ajv](https://ajv.js.org/strict-mode.html) for options `strictSchema`, `strictNumbers` and `strictTuples`)
@@ -55,7 +55,7 @@ Further options to add to the commands above:
 It only checks the contained items/collections, but not the other parts of the response (e.g. `links`).
 
 You can also pass a config file via the `--config` option. Simply pass a file path as value.
-Parameters set via CLI will not override the corresponding setting in the config file.
+Options passed on the CLI override the corresponding setting in the config file.
 
 The config file uses the same option names as above.
 To specify the files to be validated, add an array with paths.

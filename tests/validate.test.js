@@ -96,6 +96,21 @@ describe('Validate Function Tests', () => {
       expect(result.id).toBe('tests/examples/catalog-with-invalid-schema.json');
       expect(result.results.extensions['https://example.org/invalid-schema.json']).toBeDefined();
     });
+
+    it('Should map a partial URL to a local folder so that all children are mapped', async () => {
+      const config = {
+        loader: nodeLoader,
+        schemaMap: {
+          'https://example.org/': 'tests/',
+        },
+      };
+
+      const result = await validate(invalidSchemaCatalogPath, config);
+
+      // The extension URL https://example.org/invalid-schema.json resolves to tests/invalid-schema.json
+      expect(result.type).toBe('Catalog');
+      expect(result.results.extensions['https://example.org/invalid-schema.json']).toBeDefined();
+    });
   });
 
   describe('Validate with verbose messaging', () => {

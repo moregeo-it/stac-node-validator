@@ -5,7 +5,25 @@ const path = require('path');
 
 const { strArrayToObject } = require('./nodeUtils');
 
+// Default values for the CLI options. Applied as the base of the config so that
+// values from a config file and explicitly passed CLI options override them.
+const defaults = {
+  lint: false,
+  format: false,
+  schemas: null,
+  schemaMap: {},
+  custom: null,
+  ignoreCerts: false,
+  depth: -1,
+  strict: false,
+  verbose: false,
+  config: null,
+};
+
 function fromCLI() {
+  // Note: The options intentionally don't declare defaults so that the parsed
+  // object only contains the options that were explicitly passed. This lets the
+  // CLI options override the config file options (see bin/cli.js).
   let config = yargs(hideBin(process.argv))
     .parserConfiguration({
       'camel-case-expansion': false,
@@ -15,26 +33,22 @@ function fromCLI() {
     .option('lint', {
       alias: 'l',
       type: 'boolean',
-      default: false,
       description:
         'Check whether the JSON files are well-formatted, based on the JavaScript implementation with a 2-space indentation.',
     })
     .option('format', {
       alias: 'f',
       type: 'boolean',
-      default: false,
       description: 'Writes the JSON files according to the linting rules.\nATTENTION: Overrides the source files!',
     })
     .option('schemas', {
       alias: 's',
       type: 'string',
-      default: null,
       requiresArg: true,
       description: 'Validate against schemas in a local or remote STAC folder.',
     })
     .option('schemaMap', {
       type: 'array',
-      default: [],
       requiresArg: true,
       description:
         'Validate against a specific local schema (e.g. an external extension). Provide the schema URI and the local path separated by an equal sign.\nExample: https://stac-extensions.github.io/foobar/v1.0.0/schema.json=./json-schema/schema.json\nThis can also be a partial URL and path so that all children are also mapped.\nExample: https://stac-extensions.github.io/foobar/=./json-schema/',
@@ -42,36 +56,30 @@ function fromCLI() {
     })
     .option('custom', {
       type: 'string',
-      default: null,
       description: 'Load a custom validation routine from a JavaScript file.',
     })
     .option('ignoreCerts', {
       type: 'boolean',
-      default: false,
       description: 'Disable verification of SSL/TLS certificates.',
     })
     .option('depth', {
       type: 'integer',
-      default: -1,
       description:
         'The number of levels to recurse into when looking for files in folders. 0 = no subfolders, -1 = unlimited',
     })
     .option('strict', {
       type: 'boolean',
-      default: false,
       description:
         'Enable strict mode in validation for schemas and numbers (as defined by ajv for options `strictSchema`, `strictNumbers` and `strictTuples`.',
     })
     .option('verbose', {
       alias: 'v',
       type: 'boolean',
-      default: false,
       description: 'Run with verbose logging and a diff for linting.',
     })
     .option('config', {
       alias: 'c',
       type: 'string',
-      default: null,
       description: 'Load the options from a config file (.js or .json). CLI options override config options.',
     })
     .version()
@@ -104,6 +112,7 @@ async function fromFile(filepath) {
 }
 
 module.exports = {
+  defaults,
   fromCLI,
   fromFile,
 };

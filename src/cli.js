@@ -14,10 +14,21 @@ async function run() {
     'Warning: Schema-based STAC validation may be incomplete and should only be considered as a first indicator of validity.\n',
   );
 
-  // Read config from CLI and config file (if any)
-  let config = ConfigSource.fromCLI();
-  if (typeof config.config === 'string') {
-    Object.assign(config, await ConfigSource.fromFile(config.config));
+  // Read config from CLI and config file (if any).
+  // Precedence (lowest to highest): defaults < config file < explicitly passed CLI options.
+  const cliConfig = ConfigSource.fromCLI();
+  const cliFiles = cliConfig.files;
+  delete cliConfig.files;
+
+  let config = Object.assign({}, ConfigSource.defaults);
+  if (typeof cliConfig.config === 'string') {
+    Object.assign(config, await ConfigSource.fromFile(cliConfig.config));
+  }
+  Object.assign(config, cliConfig);
+
+  // Files passed on the CLI override the config file, but an empty list doesn't.
+  if (cliFiles.length > 0 || !Array.isArray(config.files)) {
+    config.files = cliFiles;
   }
   if (!config.loader) {
     config.loader = nodeLoader;
