@@ -174,6 +174,11 @@ async function validateOne(data, config, report = null) {
   report.version = data.stac_version;
   report.type = data.type;
 
+  // Make the parsed document available to cross-file rules (opt-in; no-op otherwise).
+  if (config._resolver && isObject(data)) {
+    config._resolver.registerInput(report.source, data);
+  }
+
   if (config.customValidator) {
     data = await config.customValidator.afterLoading(data, report, config);
   }

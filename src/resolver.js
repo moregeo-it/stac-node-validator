@@ -71,6 +71,21 @@ class Resolver {
   }
 
   /**
+   * Registers an already-parsed input document so cross-file rules can reuse it
+   * instead of loading it again. No-op without a usable source.
+   *
+   * @param {string|null} source The document's `report.source`.
+   * @param {Object} data The parsed document.
+   */
+  registerInput(source, data) {
+    if (!this.index || !source || !data || typeof data !== 'object') {
+      return;
+    }
+    const location = isHttpUrl(source) ? source : normalizePath(path.resolve(source));
+    this.index.register({ location, source, data });
+  }
+
+  /**
    * Resolves and loads a target, reusing the document index and caching results
    * (including negative results). Never throws.
    *

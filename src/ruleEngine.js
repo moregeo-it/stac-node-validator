@@ -234,4 +234,30 @@ class RuleEngineValidator extends BaseValidator {
   }
 }
 
-module.exports = { RuleEngineValidator, resolveRuleConfig, isRuleConfigActive, parseSeverity };
+/**
+ * Resolves the rule configuration and attaches the cross-file resolver/index to
+ * the config, returning the engine validator ready to be used (or composed).
+ *
+ * @param {import('./index').Config} config
+ * @returns {RuleEngineValidator}
+ */
+function configureRules(config) {
+  const DocumentIndex = require('./documentIndex');
+  const { Resolver } = require('./resolver');
+  const resolved = resolveRuleConfig(config);
+  if (!config._documentIndex) {
+    config._documentIndex = new DocumentIndex();
+  }
+  if (!config._resolver) {
+    config._resolver = new Resolver(config, config._documentIndex);
+  }
+  return new RuleEngineValidator(resolved);
+}
+
+module.exports = {
+  RuleEngineValidator,
+  resolveRuleConfig,
+  isRuleConfigActive,
+  configureRules,
+  parseSeverity,
+};
