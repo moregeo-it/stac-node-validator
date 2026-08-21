@@ -39,7 +39,7 @@
  *
  */
 
-/*! Axios v1.13.6 Copyright (c) 2026 Matt Zabriskie and contributors */
+/*! Axios v1.19.0 Copyright (c) 2026 Matt Zabriskie and contributors */
 
 /*! https://mths.be/punycode v1.4.0 by @mathias */
 
