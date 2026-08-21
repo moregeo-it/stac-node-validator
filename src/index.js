@@ -32,11 +32,22 @@ const BaseValidator = require('./baseValidator');
  */
 
 /**
+ * @typedef RuleFinding
+ * @type {Object}
+ * @property {string} ruleId
+ * @property {string} severity One of 'warn' or 'error'.
+ * @property {string} message
+ * @property {string} instancePath
+ * @property {string|null} source
+ */
+
+/**
  * @typedef Results
  * @type {Object}
  * @property {Array.<Error>} core
  * @property {Object.<string, Array.<Error>>} extensions
  * @property {Array.<Error>} custom
+ * @property {Array.<RuleFinding>} rules
  */
 
 /**
@@ -55,6 +66,7 @@ function createReport() {
       core: [],
       extensions: {},
       custom: [],
+      rules: [],
     },
     apiList: false,
     source: null,

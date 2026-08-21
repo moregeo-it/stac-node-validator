@@ -120,6 +120,60 @@ function normalizePath(p) {
   return p.replace(/\\/g, '/').replace(/\/$/, '');
 }
 
+/**
+ * Computes a stable cache/index key for a resolved location (local path or URL).
+ *
+ * Local paths are lower-cased on Windows to absorb the case-insensitive file system;
+ * URLs keep their path case but normalize scheme and host.
+ *
+ * @param {string} loc
+ * @returns {string}
+ */
+function locationKey(loc) {
+  if (typeof loc !== 'string') {
+    return String(loc);
+  }
+  if (isHttpUrl(loc)) {
+    const parsed = URL.parse(loc);
+    if (parsed) {
+      return `${parsed.protocol.toLowerCase()}//${(parsed.host || '').toLowerCase()}${parsed.pathname}${parsed.search || ''}`;
+    }
+    return loc;
+  }
+  const normalized = normalizePath(loc);
+  return process.platform === 'win32' ? normalized.toLowerCase() : normalized;
+}
+
+/**
+ * Counts rule-engine findings by severity across a report and all its children.
+ *
+ * @param {import('./index').Report} report
+ * @returns {{ warnings: number, ruleErrors: number }}
+ */
+function countRuleFindings(report) {
+  let warnings = 0;
+  let ruleErrors = 0;
+  const walk = (r) => {
+    if (!r) {
+      return;
+    }
+    if (r.results && Array.isArray(r.results.rules)) {
+      for (const finding of r.results.rules) {
+        if (finding.severity === 'warn') {
+          warnings++;
+        } else if (finding.severity === 'error') {
+          ruleErrors++;
+        }
+      }
+    }
+    if (Array.isArray(r.children)) {
+      r.children.forEach(walk);
+    }
+  };
+  walk(report);
+  return { warnings, ruleErrors };
+}
+
 function getSummary(result, config) {
   let summary = {
     total: 0,
@@ -127,7 +181,12 @@ function getSummary(result, config) {
     invalid: 0,
     malformed: null,
     skipped: 0,
+    warnings: 0,
+    ruleErrors: 0,
   };
+  const findings = countRuleFindings(result);
+  summary.warnings = findings.warnings;
+  summary.ruleErrors = findings.ruleErrors;
   if (result.children.length > 0) {
     // todo: speed this up by computing in one iteration
     summary.total = result.children.length;
@@ -172,6 +231,7 @@ function makeAjvErrorMessage(error) {
 }
 
 module.exports = {
+  countRuleFindings,
   createAjv,
   getAjvForSchema,
   getSummary,
@@ -179,6 +239,7 @@ module.exports = {
   isHttpUrl,
   loadSchema,
   loadSchemaFromUri,
+  locationKey,
   makeAjvErrorMessage,
   normalizePath,
   SCHEMA_DRAFT_URLS,
