@@ -106,9 +106,7 @@ async function run() {
     } catch (error) {
       abort(error.message);
     }
-    config.customValidator = config.customValidator
-      ? new CompositeValidator([config.customValidator, engine])
-      : engine;
+    config.customValidator = config.customValidator ? new CompositeValidator([config.customValidator, engine]) : engine;
   }
 
   // In Node, automatically enable JSON Schema 2019-09 and 2020-12 support

@@ -198,7 +198,8 @@ class RuleEngineValidator extends BaseValidator {
     }
     const resolver = config._resolver;
     const links = Array.isArray(data.links) ? data.links : [];
-    const crossFileAvailable = Boolean(resolver) && (Boolean(report.source) || links.some((l) => l && l.rel === 'self'));
+    const crossFileAvailable =
+      Boolean(resolver) && (Boolean(report.source) || links.some((l) => l && l.rel === 'self'));
 
     for (const [id, { severity, options }] of this.severities) {
       if (severity === 'off') {
