@@ -8,8 +8,8 @@ const datetimeUtc = require('../src/rules/datetime-utc');
 const requireSelfLink = require('../src/rules/require-self-link');
 const linkTitle = require('../src/rules/link-title-matches-target');
 
-const catalog = require('./examples/rules/catalog.json');
-const catalogOk = require('./examples/rules/catalog-ok.json');
+const catalog = require('./rules-fixtures/catalog.json');
+const catalogOk = require('./rules-fixtures/catalog-ok.json');
 
 function makeContext(data, { source = null, version = '1.0.0', options = {} } = {}) {
   const report = { source, version, results: { rules: [] } };
@@ -114,7 +114,7 @@ describe('Built-in rules', () => {
 
   describe('stac/link-title-matches-target (cross-file)', () => {
     it('flags a link whose title differs from the target document title', async () => {
-      const { context, findings } = makeContext(catalog, { source: 'tests/examples/rules/catalog.json' });
+      const { context, findings } = makeContext(catalog, { source: 'tests/rules-fixtures/catalog.json' });
       await linkTitle.check(catalog, context);
       expect(findings).toHaveLength(1);
       expect(findings[0].instancePath).toBe('/links/1/title');
@@ -122,7 +122,7 @@ describe('Built-in rules', () => {
     });
 
     it('does not flag when link titles match their targets', async () => {
-      const { context, findings } = makeContext(catalogOk, { source: 'tests/examples/rules/catalog-ok.json' });
+      const { context, findings } = makeContext(catalogOk, { source: 'tests/rules-fixtures/catalog-ok.json' });
       await linkTitle.check(catalogOk, context);
       expect(findings).toHaveLength(0);
     });

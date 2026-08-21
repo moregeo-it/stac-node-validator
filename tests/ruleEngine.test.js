@@ -2,14 +2,14 @@ const { RuleEngineValidator, resolveRuleConfig, isRuleConfigActive, parseSeverit
 const { Resolver } = require('../src/resolver');
 const DocumentIndex = require('../src/documentIndex');
 const nodeLoader = require('../src/loader/node');
-const catalog = require('./examples/rules/catalog.json');
+const catalog = require('./rules-fixtures/catalog.json');
 
 function runEngine(ruleConfig) {
   const config = { loader: nodeLoader };
   config._documentIndex = new DocumentIndex();
   config._resolver = new Resolver(config, config._documentIndex);
   const engine = new RuleEngineValidator(resolveRuleConfig(ruleConfig));
-  const report = { source: 'tests/examples/rules/catalog.json', version: '1.0.0', valid: true, results: { rules: [] } };
+  const report = { source: 'tests/rules-fixtures/catalog.json', version: '1.0.0', valid: true, results: { rules: [] } };
   return engine.afterValidation(catalog, null, report, config).then(() => report);
 }
 
