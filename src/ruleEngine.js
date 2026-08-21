@@ -8,6 +8,24 @@ const { builtinRules, builtinRulesets } = require('./rules');
 const SEVERITIES = ['off', 'warn', 'error'];
 
 /**
+ * Loads an external ruleset/preset module by path. This is a Node-only feature;
+ * the browser build never reaches this code path. `module.require` is captured
+ * lazily (only when an external preset is actually requested) and invoked through
+ * a variable, so bundlers neither evaluate it at load time nor try to statically
+ * resolve the dynamic path.
+ *
+ * @param {string} request
+ * @returns {Object}
+ */
+function loadExternalPreset(request) {
+  const req = typeof module !== 'undefined' && module.require ? module.require.bind(module) : null;
+  if (!req) {
+    throw new Error(`External rulesets can only be loaded in a Node environment (failed to load "${request}").`);
+  }
+  return req(path.resolve(process.cwd(), request));
+}
+
+/**
  * Whether any rule configuration is present. When false the engine is not attached
  * and behavior is identical to previous versions.
  *
@@ -68,7 +86,7 @@ function resolveRuleConfig(config) {
       if (builtinRulesets[preset]) {
         ruleset = builtinRulesets[preset];
       } else {
-        ruleset = require(path.resolve(process.cwd(), preset));
+        ruleset = loadExternalPreset(preset);
       }
     } else if (isObject(preset)) {
       ruleset = preset;
@@ -123,24 +141,18 @@ function resolveRuleConfig(config) {
 }
 
 /**
- * Determines whether a rule applies to the given document.
+ * Determines whether a rule's declared STAC types match the document. This is
+ * deterministic engine-side filtering; the rule's own `applies` hook is evaluated
+ * separately (inside the crash-reporting path) because it may throw.
  *
  * @param {Object} rule
  * @param {Object} data
- * @param {import('./index').Report} report
  * @returns {boolean}
  */
-function ruleApplies(rule, data, report) {
+function matchesStacType(rule, data) {
   const meta = rule.meta || {};
   if (Array.isArray(meta.stacTypes) && meta.stacTypes.length > 0 && !meta.stacTypes.includes(data.type)) {
     return false;
-  }
-  if (typeof rule.applies === 'function') {
-    try {
-      return Boolean(rule.applies(data, { report }));
-    } catch {
-      return false;
-    }
   }
   return true;
 }
@@ -212,11 +224,14 @@ class RuleEngineValidator extends BaseValidator {
       if (rule.meta && rule.meta.needsCrossFile && !crossFileAvailable) {
         continue;
       }
-      if (!ruleApplies(rule, data, report)) {
+      if (!matchesStacType(rule, data)) {
         continue;
       }
-      const context = buildContext({ rule, severity, options, data, report, config, resolver });
       try {
+        if (typeof rule.applies === 'function' && !rule.applies(data, { report })) {
+          continue;
+        }
+        const context = buildContext({ rule, severity, options, data, report, config, resolver });
         await rule.check(data, context);
       } catch (error) {
         report.results.rules.push({

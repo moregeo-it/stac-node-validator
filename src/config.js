@@ -18,6 +18,10 @@ const defaults = {
   strict: false,
   verbose: false,
   config: null,
+  maxWarnings: -1,
+  resolveRemote: false,
+  linkPrefix: null,
+  localRoot: null,
 };
 
 function fromCLI() {
@@ -60,14 +64,12 @@ function fromCLI() {
     })
     .option('ruleset', {
       type: 'array',
-      default: [],
       requiresArg: true,
       description:
         'Enable an opt-in best-practice ruleset by name (e.g. "recommended", "stac-best-practices") or a path/module.\nCan be given multiple times.',
     })
     .option('rules', {
       type: 'array',
-      default: [],
       requiresArg: true,
       description:
         'Enable or configure individual rules. Provide the rule id and severity (off, warn or error) separated by an equal sign.\nExample: stac/id-url-safe=error',
@@ -75,23 +77,19 @@ function fromCLI() {
     })
     .option('maxWarnings', {
       type: 'number',
-      default: -1,
       description: 'Number of rule warnings to allow before exiting with an error. -1 = unlimited.',
     })
     .option('resolveRemote', {
       type: 'boolean',
-      default: false,
       description: 'Allow cross-file rules to fetch remote (HTTP) link targets. Disabled by default.',
     })
     .option('linkPrefix', {
       type: 'string',
-      default: null,
       requiresArg: true,
       description: 'A public URL prefix that cross-file rules map to a local root (see --localRoot).',
     })
     .option('localRoot', {
       type: 'string',
-      default: null,
       requiresArg: true,
       description: 'The local folder that --linkPrefix maps to. Defaults to the current working directory.',
     })

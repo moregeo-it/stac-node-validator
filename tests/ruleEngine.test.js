@@ -114,5 +114,27 @@ describe('Rule engine configuration', () => {
       expect(report.results.rules).toHaveLength(0);
       expect(report.valid).toBe(true);
     });
+
+    it('reports an exception from a rule applies() hook as a crash', async () => {
+      const badRule = {
+        id: 'test/throwing-applies',
+        meta: { needsCrossFile: false },
+        applies() {
+          throw new Error('boom in applies');
+        },
+        check() {},
+      };
+      const resolved = resolveRuleConfig({
+        plugins: { test: { rules: { 'throwing-applies': badRule } } },
+        rules: { 'test/throwing-applies': 'error' },
+      });
+      const engine = new RuleEngineValidator(resolved);
+      const report = { source: 'x.json', version: '1.0.0', valid: true, results: { rules: [] } };
+      await engine.afterValidation({ type: 'Catalog', id: 'x' }, null, report, {});
+      expect(report.results.rules).toHaveLength(1);
+      expect(report.results.rules[0].severity).toBe('error');
+      expect(report.results.rules[0].message).toContain('Rule crashed');
+      expect(report.valid).toBe(false);
+    });
   });
 });

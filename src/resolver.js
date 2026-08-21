@@ -18,6 +18,18 @@ const { isHttpUrl, locationKey, normalizePath } = require('./utils');
 const hrefOf = (linkOrHref) => (typeof linkOrHref === 'string' ? linkOrHref : linkOrHref && linkOrHref.href);
 
 /**
+ * Whether `target` is `root` itself or nested inside it (no `..` escape).
+ *
+ * @param {string} root Absolute path.
+ * @param {string} target Absolute path.
+ * @returns {boolean}
+ */
+function isInside(root, target) {
+  const rel = path.relative(root, target);
+  return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
+}
+
+/**
  * Resolves and loads documents referenced from other documents (e.g. via links),
  * caching every resolved location so each target is loaded at most once per run.
  */
@@ -45,9 +57,19 @@ class Resolver {
 
     // 1. Rewrite a known public URL prefix to a local root, if configured.
     if (linkPrefix && typeof href === 'string' && href.startsWith(linkPrefix)) {
-      const root = localRoot || this.config._runRoot || '.';
-      const rel = href.slice(linkPrefix.length);
-      return { location: normalizePath(path.resolve(root, rel)), remote: false };
+      const root = path.resolve(localRoot || this.config._runRoot || '.');
+      // Treat the suffix strictly as a relative path within the root: drop any
+      // query/fragment and leading slashes so it can't become absolute, then
+      // verify the resolved path does not escape the root via `..`.
+      const rel = href
+        .slice(linkPrefix.length)
+        .split(/[?#]/)[0]
+        .replace(/^[\\/]+/, '');
+      const resolved = path.resolve(root, rel);
+      if (!isInside(root, resolved)) {
+        return { location: normalizePath(resolved), remote: false, outsideRoot: true };
+      }
+      return { location: normalizePath(resolved), remote: false };
     }
 
     // 2. Absolute HTTP(S) URL.
@@ -97,14 +119,16 @@ class Resolver {
     if (!href) {
       return { location: '', found: false, data: null, source: null, remote: false };
     }
-    const { location, remote } = this.resolveLocation(href, base);
+    const { location, remote, outsideRoot } = this.resolveLocation(href, base);
     const key = locationKey(location);
     if (this.cache.has(key)) {
       return this.cache.get(key);
     }
 
     let result;
-    if (this.index && this.index.has(key)) {
+    if (outsideRoot) {
+      result = { location, found: false, data: null, source: null, remote, skipped: 'outside-root' };
+    } else if (this.index && this.index.has(key)) {
       const entry = this.index.get(key);
       result = { location, found: true, data: entry.data, source: entry.source, remote, fromIndex: true };
     } else if (remote && !this.config.resolveRemote) {
