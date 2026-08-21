@@ -1,0 +1,11 @@
+{
+  "stac_version": "1.0.0",
+  "id": "rules-example",
+  "type": "Catalog",
+  "title": "Rules Example Catalog",
+  "description": "Root catalog for rule engine tests",
+  "links": [
+    { "rel": "root", "href": "./catalog.json", "type": "application/json", "title": "Rules Example Catalog" },
+    { "rel": "child", "href": "./child/collection.json", "type": "application/json", "title": "Wrong Child Title" }
+  ]
+}
