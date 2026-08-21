@@ -4,7 +4,7 @@ Validate STAC Items, Catalogs, Collections and all STAC extensions in JavaScript
 
 ## Versions
 
-**Current version:** 2.0.0-rc.3
+**Current version:** 2.0.0
 
 | STAC Node Validator Version | Supported STAC Versions          |
 | --------------------------- | -------------------------------- |
