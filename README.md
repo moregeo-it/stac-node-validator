@@ -50,6 +50,12 @@ Further options to add to the commands above:
 - To lint local JSON files: `--lint` (add `--verbose` to get a diff with the changes required)
 - To format / pretty-print local JSON files: `--format` (Attention: this will override the source files without warning!)
 - To run custom validation code: `--custom ./path/to/validation.js` - The validation.js needs to contain a class that implements the `BaseValidator` interface. See [custom.example.js](./custom.example.js) for an example.
+- To enable opt-in best-practice rules: `--ruleset recommended` (see [Best Practice Rules](#best-practice-rules)). Repeat the option to combine rulesets and/or point it to a custom ruleset module.
+- To enable or configure individual rules: `--rules stac/id-url-safe=error --rules stac/datetime-utc=off`
+- To fail the run once a number of warnings is exceeded: `--maxWarnings 0` (default: `-1`, i.e. warnings never fail the run)
+- To let cross-file rules fetch remote (HTTP) link targets: `--resolveRemote` (disabled by default so validation stays offline and deterministic)
+
+> **Note:** `--ruleset` and `--rules` accept multiple values, so list the files/folders to validate *before* these options (or after a `--`) to avoid them being consumed as rule arguments.
 
 **Note on API support:** Validating lists of STAC items/collections (i.e. `GET /collections` and `GET /collections/:id/items`) is partially supported.
 It only checks the contained items/collections, but not the other parts of the response (e.g. `links`).
@@ -382,6 +388,109 @@ class CustomValidator extends BaseValidator {
     this.ids.add(data.id);
   }
 }
+```
+
+## Best Practice Rules
+
+JSON Schemas can only validate a single document in isolation and cannot express many of the
+recommendations in the [STAC specification](https://github.com/radiantearth/stac-spec) and the
+[STAC Best Practices](https://github.com/radiantearth/stac-best-practices/). The **rule engine**
+adds these checks as opt-in, configurable modules, similar to ESLint. It is disabled by default:
+if you don't enable any rules, validation behaves exactly as before.
+
+### Enabling rules
+
+Enable a ruleset (preset) and/or configure individual rules. On the CLI:
+
+```bash
+stac-node-validator ./catalog --ruleset recommended
+stac-node-validator ./catalog --ruleset recommended --rules stac/id-url-safe=error
+```
+
+Or via a config file / programmatically:
+
+```javascript
+const config = {
+  extends: ['recommended'],
+  rules: {
+    'stac/id-url-safe': 'error',
+    'stac/no-proprietary-license': ['warn', { allow: ['various'] }],
+    'stac/datetime-utc': 'off',
+  },
+  maxWarnings: -1, // fail the run when warnings exceed this number; -1 = never
+};
+```
+
+Each rule has a severity: `off`, `warn`, or `error` (ESLint numeric levels `0`/`1`/`2` also work).
+Only `error` findings make a document invalid and set a non-zero exit code; `warn` findings are
+reported but do not fail the run unless `maxWarnings` is exceeded. Findings are collected in the new
+`report.results.rules` bucket, separate from the schema results.
+
+### Rulesets
+
+A ruleset is a named bundle of rules with default severities. Built-in rulesets:
+
+- `recommended` — a conservative set, all warnings.
+- `stac-best-practices` — extends `recommended` with additional/stricter rules.
+
+### Built-in rules
+
+| Rule | Description | Cross-file |
+| --- | --- | --- |
+| `stac/id-url-safe` | The `id` should only use URL-safe characters. | no |
+| `stac/no-proprietary-license` | Collections should provide a concrete license instead of `proprietary`/`various`. | no |
+| `stac/datetime-utc` | Item date/time properties should use UTC. | no |
+| `stac/require-self-link` | Published documents should have an absolute `self` link. | no |
+| `stac/link-title-matches-target` | A link's `title` should match the title of the referenced document. | yes |
+
+See [docs/rules](./docs/rules) for details on each rule and its options.
+
+### Cross-file rules
+
+Some rules (marked *Cross-file* above) resolve links and inspect the referenced documents. Relative
+links are resolved against the document's `self` link (if absolute) or its source path. Remote
+(HTTP) targets are **not** fetched unless `--resolveRemote` / `resolveRemote: true` is set. When a
+public URL prefix maps to a local folder, configure `linkPrefix` and `localRoot` so the targets can
+be found on disk.
+
+### Custom rules and external rulesets
+
+Rules are plain objects and can be shipped by third parties (e.g. a project-specific ruleset).
+Register them via `plugins` and enable them via `rules`, or bundle them in a ruleset module that
+you reference from `extends`. See [examples/custom-ruleset.js](./examples/custom-ruleset.js).
+
+```javascript
+const config = {
+  plugins: { acme: require('acme-stac-rules') }, // { rules: { 'my-rule': { meta, applies, check } } }
+  extends: ['recommended', './my-ruleset.js'],
+  rules: { 'acme/my-rule': 'error' },
+};
+```
+
+A rule is an object of the following shape:
+
+```javascript
+module.exports = {
+  id: 'acme/my-rule',
+  meta: {
+    description: 'What the rule checks.',
+    category: 'metadata',
+    defaultSeverity: 'warn',
+    needsCrossFile: false, // set true if `check` uses context.resolve/getTitle
+    stacTypes: ['Catalog', 'Collection', 'Feature'], // or null for any
+    versions: null,
+  },
+  applies(data, context) {
+    return true; // cheap gate; the engine already filters by type/severity
+  },
+  async check(data, context) {
+    // Report a finding (severity is applied by the engine):
+    context.report({ message: '...', instancePath: '/some/path' });
+    // Or, for cross-file checks:
+    // const target = await context.resolve(link); // { data, source } | null
+    // const title = await context.getTitle(link); // string | null
+  },
+};
 ```
 
 ## Development

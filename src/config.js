@@ -18,6 +18,10 @@ const defaults = {
   strict: false,
   verbose: false,
   config: null,
+  maxWarnings: -1,
+  resolveRemote: false,
+  linkPrefix: null,
+  localRoot: null,
 };
 
 function fromCLI() {
@@ -58,6 +62,37 @@ function fromCLI() {
       type: 'string',
       description: 'Load a custom validation routine from a JavaScript file.',
     })
+    .option('ruleset', {
+      type: 'array',
+      requiresArg: true,
+      description:
+        'Enable an opt-in best-practice ruleset by name (e.g. "recommended", "stac-best-practices") or a path/module.\nCan be given multiple times.',
+    })
+    .option('rules', {
+      type: 'array',
+      requiresArg: true,
+      description:
+        'Enable or configure individual rules. Provide the rule id and severity (off, warn or error) separated by an equal sign.\nExample: stac/id-url-safe=error',
+      coerce: strArrayToObject,
+    })
+    .option('maxWarnings', {
+      type: 'number',
+      description: 'Number of rule warnings to allow before exiting with an error. -1 = unlimited.',
+    })
+    .option('resolveRemote', {
+      type: 'boolean',
+      description: 'Allow cross-file rules to fetch remote (HTTP) link targets. Disabled by default.',
+    })
+    .option('linkPrefix', {
+      type: 'string',
+      requiresArg: true,
+      description: 'A public URL prefix that cross-file rules map to a local root (see --localRoot).',
+    })
+    .option('localRoot', {
+      type: 'string',
+      requiresArg: true,
+      description: 'The local folder that --linkPrefix maps to. Defaults to the current working directory.',
+    })
     .option('ignoreCerts', {
       type: 'boolean',
       description: 'Disable verification of SSL/TLS certificates.',
@@ -88,6 +123,16 @@ function fromCLI() {
   delete config.$0;
   config.files = config._;
   delete config._;
+
+  // Map the --ruleset flag onto the `extends` config key; drop empty defaults so
+  // config-file values can take over and the rule engine stays off when unused.
+  if (Array.isArray(config.ruleset) && config.ruleset.length > 0) {
+    config.extends = config.ruleset;
+  }
+  delete config.ruleset;
+  if (config.rules && Object.keys(config.rules).length === 0) {
+    delete config.rules;
+  }
 
   return config;
 }

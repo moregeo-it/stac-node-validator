@@ -7,6 +7,8 @@ const { printConfig, printLint, printSummary, resolveFiles, printReport, abort }
 const nodeLoader = require('./loader/node');
 const { getSummary, normalizePath } = require('./utils');
 const lint = require('./lint');
+const { isRuleConfigActive, configureRules } = require('./ruleEngine');
+const CompositeValidator = require('./compositeValidator');
 
 async function run() {
   console.log(`STAC Node/JS Validator v${version}\n`);
@@ -96,6 +98,17 @@ async function run() {
     config.customValidator = new validator();
   }
 
+  // Set up the opt-in best-practice rule engine (composed with any --custom validator)
+  if (isRuleConfigActive(config)) {
+    let engine;
+    try {
+      engine = configureRules(config);
+    } catch (error) {
+      abort(error.message);
+    }
+    config.customValidator = config.customValidator ? new CompositeValidator([config.customValidator, engine]) : engine;
+  }
+
   // In Node, automatically enable JSON Schema 2019-09 and 2020-12 support
   // (no bundle size concern in Node; browser users can opt-in via config.schemaVersions)
   config.schemaVersions = {
@@ -121,7 +134,10 @@ async function run() {
   printSummary(summary);
 
   // Exit with error code or report success
-  let errored = summary.invalid > 0 || (config.lint && !config.format && summary.malformed > 0) ? 1 : 0;
+  const maxWarnings = typeof config.maxWarnings === 'number' ? config.maxWarnings : -1;
+  const tooManyWarnings = maxWarnings >= 0 && summary.warnings > maxWarnings;
+  let errored =
+    summary.invalid > 0 || (config.lint && !config.format && summary.malformed > 0) || tooManyWarnings ? 1 : 0;
   process.exit(errored);
 }
 

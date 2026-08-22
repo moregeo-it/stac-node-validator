@@ -2,7 +2,7 @@ const klaw = require('klaw');
 const fs = require('fs-extra');
 const path = require('path');
 
-const { makeAjvErrorMessage, isHttpUrl, SUPPORTED_PROTOCOLS } = require('./utils');
+const { countRuleFindings, makeAjvErrorMessage, isHttpUrl, SUPPORTED_PROTOCOLS } = require('./utils');
 
 const SCHEMA_CHOICE = ['anyOf', 'oneOf'];
 
@@ -25,6 +25,9 @@ function printSummary(summary) {
     console.log('Malformed: ' + summary.malformed);
   }
   console.log('Skipped: ' + summary.skipped);
+  if (summary.warnings) {
+    console.log('Warnings: ' + summary.warnings);
+  }
   console.groupEnd();
 }
 
@@ -74,7 +77,9 @@ function printLint(lint, config) {
 }
 
 function printReport(report, config) {
-  if (report.valid && !config.verbose) {
+  // Rule findings (including warnings on otherwise-valid documents) must still be shown.
+  const findingCounts = countRuleFindings(report);
+  if (report.valid && !config.verbose && findingCounts.warnings + findingCounts.ruleErrors === 0) {
     return;
   }
 
@@ -111,8 +116,26 @@ function printReport(report, config) {
     }
   }
 
+  if (Array.isArray(report.results.rules) && report.results.rules.length > 0) {
+    printRuleFindings(report.results.rules);
+  }
+
   report.children.forEach((child) => printReport(child, config));
 
+  console.groupEnd();
+}
+
+function printRuleFindings(findings) {
+  const order = { error: 0, warn: 1 };
+  console.group('Best Practices');
+  findings
+    .slice()
+    .sort((a, b) => (order[a.severity] ?? 9) - (order[b.severity] ?? 9))
+    .forEach((finding, i) => {
+      const label = finding.severity === 'error' ? 'error' : 'warning';
+      const loc = finding.instancePath ? `${finding.instancePath} ` : '';
+      console.log(`${i + 1}. ${label} [${finding.ruleId}] ${loc}${finding.message}`);
+    });
   console.groupEnd();
 }
 

@@ -26,6 +26,23 @@ describe('Validate Function Tests', () => {
     });
   });
 
+  describe('Rule engine (programmatic activation)', () => {
+    it('runs opt-in rules when configured via the config, without the CLI', async () => {
+      const config = { loader: nodeLoader, extends: ['recommended'] };
+      const result = await validate('tests/rules-fixtures/catalog.json', config);
+
+      const rules = result.results.rules;
+      expect(Array.isArray(rules)).toBe(true);
+      expect(rules.some((f) => f.ruleId === 'stac/link-title-matches-target')).toBe(true);
+    });
+
+    it('does not run any rules when no rule config is present', async () => {
+      const config = { loader: nodeLoader };
+      const result = await validate('tests/rules-fixtures/catalog.json', config);
+      expect(result.results.rules).toEqual([]);
+    });
+  });
+
   describe('Validate an invalid catalog', () => {
     it('Should return valid=false for an invalid catalog', async () => {
       const config = { loader: nodeLoader };

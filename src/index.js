@@ -2,6 +2,8 @@ const versions = require('compare-versions');
 
 const { createAjv, isHttpUrl, loadSchema, normalizePath, isObject } = require('./utils');
 const defaultLoader = require('./loader/default');
+const { isRuleConfigActive, configureRules } = require('./ruleEngine');
+const CompositeValidator = require('./compositeValidator');
 // eslint-disable-next-line no-unused-vars -- used as JSDoc type
 const BaseValidator = require('./baseValidator');
 
@@ -32,11 +34,22 @@ const BaseValidator = require('./baseValidator');
  */
 
 /**
+ * @typedef RuleFinding
+ * @type {Object}
+ * @property {string} ruleId
+ * @property {string} severity One of 'warn' or 'error'.
+ * @property {string} message
+ * @property {string} instancePath
+ * @property {string|null} source
+ */
+
+/**
  * @typedef Results
  * @type {Object}
  * @property {Array.<Error>} core
  * @property {Object.<string, Array.<Error>>} extensions
  * @property {Array.<Error>} custom
+ * @property {Array.<RuleFinding>} rules
  */
 
 /**
@@ -55,6 +68,7 @@ function createReport() {
       core: [],
       extensions: {},
       custom: [],
+      rules: [],
     },
     apiList: false,
     source: null,
@@ -89,6 +103,14 @@ async function validate(data, config) {
     strict: false,
   };
   config = Object.assign({}, defaultConfig, config);
+
+  // Activate the opt-in rule engine for programmatic use. The CLI configures it
+  // itself (and sets config._resolver), so this only runs when it hasn't already.
+  if (isRuleConfigActive(config) && !config._resolver) {
+    const engine = configureRules(config);
+    config.customValidator = config.customValidator ? new CompositeValidator([config.customValidator, engine]) : engine;
+  }
+
   config.ajv = createAjv(config);
   if (config.customValidator) {
     config.ajv = await config.customValidator.createAjv(config.ajv);
@@ -161,6 +183,11 @@ async function validateOne(data, config, report = null) {
   }
   report.version = data.stac_version;
   report.type = data.type;
+
+  // Make the parsed document available to cross-file rules (opt-in; no-op otherwise).
+  if (config._resolver && isObject(data)) {
+    config._resolver.registerInput(report.source, data);
+  }
 
   if (config.customValidator) {
     data = await config.customValidator.afterLoading(data, report, config);

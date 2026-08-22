@@ -1,0 +1,13 @@
+{
+  "stac_version": "1.0.0",
+  "id": "child-collection",
+  "type": "Collection",
+  "title": "Actual Child Title",
+  "description": "Child collection for rule engine tests",
+  "license": "proprietary",
+  "extent": {
+    "spatial": { "bbox": [[-180, -90, 180, 90]] },
+    "temporal": { "interval": [["2020-01-01T00:00:00Z", null]] }
+  },
+  "links": []
+}

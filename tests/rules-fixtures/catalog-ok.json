@@ -1,0 +1,10 @@
+{
+  "stac_version": "1.0.0",
+  "id": "rules-example",
+  "type": "Catalog",
+  "title": "Rules Example Catalog",
+  "description": "Root catalog whose link titles all match their targets",
+  "links": [
+    { "rel": "child", "href": "./child/collection.json", "type": "application/json", "title": "Actual Child Title" }
+  ]
+}
